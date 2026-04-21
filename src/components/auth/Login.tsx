@@ -1,6 +1,12 @@
 import { Box, Image, Flex, Text, Grid, Span, Input, Stack, Button} from "@chakra-ui/react"         
 import logo from "../../assets/login.webp"
+import { useNavigate } from "react-router-dom"
+
 const Login = () => {
+  const navigate = useNavigate()
+  const handleSignup = () => {
+    navigate("/signup")
+  }
   return (
     <Grid gridTemplateColumns="65% 35%" height="100vh">
         <Flex padding="10" borderRight="1px solid #E0E0E0">
@@ -23,7 +29,7 @@ const Login = () => {
                     <Input placeholder="Password" rounded="xl" p={6}></Input>
                     <Button bg="blue.600" color="white" rounded="3xl" fontSize="md" p={5}>Login</Button>
                     <Text textAlign="center" mt="3" mb="9">Forgot Password?</Text>
-                    <Button border="1px solid blue.600" bg="none" color="blue.500" fontSize="md" p={5} borderColor="blue.600" rounded="3xl">Create new Account</Button>
+                    <Button border="1px solid blue.600" bg="none" color="blue.500" fontSize="md" p={5} borderColor="blue.600" rounded="3xl" onClick={handleSignup}>Create new Account</Button>
                 </Stack>
             </Box>
         </Box>
