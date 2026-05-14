@@ -1,15 +1,11 @@
 import axios, { type AxiosRequestConfig } from "axios";
 
 export const axiosInstance = axios.create({
-	baseURL: "http://localhost:5023/api",
+	baseURL: "http://localhost:5182/api",
 });
 
 export interface FetchResponse<T> {
 	results: T[];
-	hasMore?: boolean;
-	totalCount?: number;
-	page?: number;
-	pageSize?: number;
 }
 
 class APIClient<T> {
