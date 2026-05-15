@@ -12,7 +12,7 @@ import {
 import { FaChevronLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
-import type { CreateUser } from "@/components/entities/CreateUser";
+import type { CreateUser } from "@/entities/CreateUser";
 import { useCreateUser } from "@/hooks/useCreateUser";
 
 const MONTH_OPTIONS = [

@@ -1,10 +1,15 @@
-import { Box, Grid, GridItem } from "@chakra-ui/react";
+import { Box, Grid, GridItem, Spinner, Text } from "@chakra-ui/react";
 import Navbar from "@/components/Navbar";
-import PostForm from "@/components/PostForm";   
-import PostCard from "@/components/PostCard.tsx";
+import PostForm from "@/components/PostForm";
+import PostCard from "@/components/PostCard";
 import LeftHome from "@/components/LeftHome";
+import { useGetPosts } from "@/hooks/useCreatePost";
 
 const HomeLayout = () => {
+	const userId = 1;
+	const { data, isLoading, isError } = useGetPosts(userId);
+	const userPosts = data ?? [];
+
 	return (
 		<Box>
 			<Navbar />
@@ -18,17 +23,27 @@ const HomeLayout = () => {
 						overflowY="auto"
 						h="100vh"
 						css={{
-							/* Hide scrollbar for Chrome, Safari and Opera */
 							"&::-webkit-scrollbar": {
 								display: "none",
 							},
-							/* Hide scrollbar for IE, Edge and Firefox */
-							"-ms-overflow-style": "none", // IE and Edge
-							"scrollbar-width": "none", // Firefox
+							"-ms-overflow-style": "none",
+							"scrollbar-width": "none",
 						}}
 					>
 						<PostForm />
-						<PostCard />
+						{isLoading && (
+							<Box py={8} textAlign="center">
+								<Spinner color="blue.500" />
+							</Box>
+						)}
+						{isError && (
+							<Text py={4} color="red.500" textAlign="center">
+								Failed to load posts.
+							</Text>
+						)}
+						{!isLoading && !isError && (
+							<PostCard userPosts={userPosts} />
+						)}
 					</GridItem>
 					<GridItem>as</GridItem>
 				</Grid>
