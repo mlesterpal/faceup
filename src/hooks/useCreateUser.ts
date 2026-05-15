@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import type {
 	CreateUser,
 	CreateUserPayload,
-} from "@/components/entities/CreateUser";
+} from "@/entities/CreateUser";
 import APIClient from "@/services/apiClient";
 import { formatBirthDateIso } from "@/utils/formatBirthDateIso";
 

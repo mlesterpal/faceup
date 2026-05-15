@@ -17,7 +17,7 @@ import { HiOutlineEmojiHappy } from "react-icons/hi";
 import { IoClose } from "react-icons/io5";
 import { useForm } from "react-hook-form";
 import { useCreatePost } from "@/hooks/useCreatePost";
-import type { CreatePost } from "@/components/entities/CreatePost";
+import type { CreatePost } from "@/entities/CreatePost";
 
 const PLACEHOLDER = "What's on your mind, Mark Lester?";
 
