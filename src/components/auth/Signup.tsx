@@ -91,7 +91,7 @@ const Signup = () => {
 
 	return (
 		<Flex>
-			<Box mx="auto" padding="20">
+			<Box mx="auto" p={{ base: "10" }}>
 				<IconButton
 					aria-label="Back to login"
 					variant="ghost"
@@ -119,7 +119,6 @@ const Signup = () => {
 									placeholder="First name"
 									autoComplete="given-name"
 									w="full"
-									flex="1"
 									{...CONTROL_PROPS}
 									{...register("firstName", {
 										required: "First name is required",
@@ -129,7 +128,6 @@ const Signup = () => {
 									placeholder="Last name"
 									autoComplete="family-name"
 									w="full"
-									flex="1"
 									{...CONTROL_PROPS}
 									{...register("lastName", {
 										required: "Last name is required",
