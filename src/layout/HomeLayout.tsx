@@ -4,9 +4,10 @@ import PostForm from "@/components/PostForm";
 import PostCard from "@/components/PostCard";
 import LeftHome from "@/components/LeftHome";
 import { useGetPosts } from "@/hooks/useCreatePost";
+import { CURRENT_USER_ID } from "@/constants/currentUser";
 
 const HomeLayout = () => {
-	const userId = 1;
+	const userId = CURRENT_USER_ID;
 	const { data, isLoading, isError } = useGetPosts(userId);
 	const userPosts = data ?? [];
 

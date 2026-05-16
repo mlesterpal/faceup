@@ -12,6 +12,7 @@ export type FriendRequest = {
 export type FriendsNavId =
 	| "home"
 	| "requests"
+	| "outgoing"
 	| "suggestions"
 	| "all"
 	| "birthdays"
