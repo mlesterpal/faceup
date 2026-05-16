@@ -5,6 +5,9 @@ import HomeLayout from "@/layout/HomeLayout"
 import MyPage from "@/components/MyPage"
 import FriendsPage from "@/pages/FriendsPage"
 import FriendRequestsView from "@/components/friends/FriendRequestsView"
+import FriendSuggestionsView from "@/components/friends/FriendSuggestionsView"
+import AllFriendsView from "@/components/friends/AllFriendsView"
+import OutgoingRequestsView from "@/components/friends/OutgoingRequestsView"
 import FriendsViewPlaceholder from "@/components/friends/FriendsViewPlaceholder"
 
 const router = createBrowserRouter([
@@ -37,16 +40,16 @@ const router = createBrowserRouter([
                 element: <FriendRequestsView />,
             },
             {
+                path: "outgoing",
+                element: <OutgoingRequestsView />,
+            },
+            {
                 path: "suggestions",
-                element: (
-                    <FriendsViewPlaceholder message="Suggestions View - 'People You May Know' Placeholder" />
-                ),
+                element: <FriendSuggestionsView />,
             },
             {
                 path: "all",
-                element: (
-                    <FriendsViewPlaceholder message="All Friends View - List Placeholder" />
-                ),
+                element: <AllFriendsView />,
             },
             {
                 path: "birthdays",

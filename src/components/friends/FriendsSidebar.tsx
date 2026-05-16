@@ -21,6 +21,13 @@ const FRIENDS_NAV_ITEMS: FriendsNavItem[] = [
 		to: "/friends/requests",
 	},
 	{
+		id: "outgoing",
+		label: "Sent requests",
+		icon: <FaUserPlus />,
+		showChevron: true,
+		to: "/friends/outgoing",
+	},
+	{
 		id: "suggestions",
 		label: "Suggestions",
 		icon: <FaUserFriends />,
