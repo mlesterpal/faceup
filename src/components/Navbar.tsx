@@ -19,6 +19,7 @@ import { IoStorefrontOutline } from "react-icons/io5";
 import { FiYoutube } from "react-icons/fi";
 import { BsFillGrid3X3GapFill } from "react-icons/bs";
 import { FaFacebookMessenger, FaUserCircle } from "react-icons/fa";
+import { Link } from "react-router-dom";
 import { Tooltip } from "@/components/ui/tooltip";
 
 const Navbar = () => {
@@ -66,23 +67,29 @@ const Navbar = () => {
 					<HStack gap={14}>
 						<Tooltip content="Home" positioning={{ placement: "bottom" }}>
 							<IconButton
+								asChild
 								variant="ghost"
 								color="gray.600"
 								_hover={{ color: "#1877f2", bg: "gray.100" }}
 								aria-label="Home"
 							>
-								<GoHome size={22} />
+								<Link to="/home">
+									<GoHome size={22} />
+								</Link>
 							</IconButton>
 						</Tooltip>
 
 						<Tooltip content="Friends" positioning={{ placement: "bottom" }}>
 							<IconButton
+								asChild
 								variant="ghost"
 								color="gray.600"
 								_hover={{ color: "#1877f2", bg: "gray.100" }}
 								aria-label="Friends"
 							>
-								<FiUser size={22} />
+								<Link to="/friends">
+									<FiUser size={22} />
+								</Link>
 							</IconButton>
 						</Tooltip>
 
