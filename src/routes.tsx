@@ -2,7 +2,7 @@ import { createBrowserRouter } from "react-router-dom"
 import Login from "./components/auth/Login"
 import Signup from "./components/auth/Signup"
 import HomeLayout from "@/layout/HomeLayout"
-import MyPage from "./components/MyPage"
+import MyPage from "@/components/MyPage"
 import FriendsPage from "@/pages/FriendsPage"
 import FriendRequestsView from "@/components/friends/FriendRequestsView"
 import FriendsViewPlaceholder from "@/components/friends/FriendsViewPlaceholder"
@@ -30,7 +30,7 @@ const router = createBrowserRouter([
         children: [
             {
                 index: true,
-                element: <FriendRequestsView />,
+                element: <FriendRequestsView preview />,
             },
             {
                 path: "requests",

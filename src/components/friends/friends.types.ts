@@ -2,9 +2,11 @@ import type { ReactNode } from "react";
 
 export type FriendRequest = {
 	id: string;
+	userId: number;
+	friendshipId?: number;
 	name: string;
 	avatarUrl?: string | null;
-	mutualFriendsCount: number;
+	mutualFriendsCount?: number;
 };
 
 export type FriendsNavId =
