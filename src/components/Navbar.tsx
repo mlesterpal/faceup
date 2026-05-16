@@ -11,6 +11,7 @@ import {
 	VStack,
 	useDisclosure,
 } from "@chakra-ui/react";
+import type { ComponentType } from "react";
 import { FaBell, FaBars, FaSearch } from "react-icons/fa";
 import { GoHome } from "react-icons/go";
 import { FiUser } from "react-icons/fi";
@@ -19,8 +20,82 @@ import { IoStorefrontOutline } from "react-icons/io5";
 import { FiYoutube } from "react-icons/fi";
 import { BsFillGrid3X3GapFill } from "react-icons/bs";
 import { FaFacebookMessenger, FaUserCircle } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { Tooltip } from "@/components/ui/tooltip";
+
+const CENTER_NAV_ITEMS = [
+	{ id: "home", label: "Home", to: "/home", icon: GoHome, end: true },
+	{ id: "friends", label: "Friends", to: "/friends", icon: FiUser, end: false },
+] as const;
+
+type NavbarNavButtonProps = {
+	to: string;
+	label: string;
+	icon: ComponentType<{ size?: number }>;
+	end?: boolean;
+};
+
+const NavbarNavButton = ({ to, label, icon: Icon, end }: NavbarNavButtonProps) => (
+	<Tooltip content={label} positioning={{ placement: "bottom" }}>
+		<IconButton asChild variant="ghost" aria-label={label}>
+			<NavLink
+				to={to}
+				end={end}
+				style={{
+					display: "flex",
+					alignItems: "center",
+					textDecoration: "none",
+				}}
+			>
+				{({ isActive }) => (
+					<Box
+						px={4}
+						py={2}
+						rounded="lg"
+						borderBottomWidth="3px"
+						borderBottomColor={isActive ? "#1877f2" : "transparent"}
+						color={isActive ? "#1877f2" : "gray.600"}
+						bg={isActive ? "gray.100" : "transparent"}
+						_hover={{ color: "#1877f2", bg: "gray.100" }}
+						display="flex"
+						alignItems="center"
+					>
+						<Icon size={22} />
+					</Box>
+				)}
+			</NavLink>
+		</IconButton>
+	</Tooltip>
+);
+
+const NavbarDrawerLink = ({
+	to,
+	label,
+	end,
+}: {
+	to: string;
+	label: string;
+	end?: boolean;
+}) => (
+	<NavLink
+		to={to}
+		end={end}
+		style={{ textDecoration: "none", color: "inherit", width: "100%" }}
+	>
+		{({ isActive }) => (
+			<Text
+				fontWeight={isActive ? "600" : "400"}
+				color={isActive ? "#1877f2" : "inherit"}
+				px={2}
+				py={1}
+				rounded="md"
+				bg={isActive ? "blue.50" : "transparent"}
+			>
+				{label}
+			</Text>
+		)}
+	</NavLink>
+);
 
 const Navbar = () => {
 	const { open, onOpen, setOpen } = useDisclosure();
@@ -65,39 +140,22 @@ const Navbar = () => {
 
 				<GridItem justifySelf="center">
 					<HStack gap={14}>
-						<Tooltip content="Home" positioning={{ placement: "bottom" }}>
-							<IconButton
-								asChild
-								variant="ghost"
-								color="gray.600"
-								_hover={{ color: "#1877f2", bg: "gray.100" }}
-								aria-label="Home"
-							>
-								<Link to="/home">
-									<GoHome size={22} />
-								</Link>
-							</IconButton>
-						</Tooltip>
-
-						<Tooltip content="Friends" positioning={{ placement: "bottom" }}>
-							<IconButton
-								asChild
-								variant="ghost"
-								color="gray.600"
-								_hover={{ color: "#1877f2", bg: "gray.100" }}
-								aria-label="Friends"
-							>
-								<Link to="/friends">
-									<FiUser size={22} />
-								</Link>
-							</IconButton>
-						</Tooltip>
+						{CENTER_NAV_ITEMS.map((item) => (
+							<NavbarNavButton
+								key={item.id}
+								to={item.to}
+								label={item.label}
+								icon={item.icon}
+								end={item.end}
+							/>
+						))}
 
 						<Tooltip content="Groups" positioning={{ placement: "bottom" }}>
 							<IconButton
 								variant="ghost"
 								color="gray.600"
-								_hover={{ color: "#1877f2", bg: "gray.100" }}
+								opacity={0.6}
+								cursor="default"
 								aria-label="Groups"
 							>
 								<PiUsersThree size={22} />
@@ -108,7 +166,8 @@ const Navbar = () => {
 							<IconButton
 								variant="ghost"
 								color="gray.600"
-								_hover={{ color: "#1877f2", bg: "gray.100" }}
+								opacity={0.6}
+								cursor="default"
 								aria-label="Store"
 							>
 								<IoStorefrontOutline size={22} />
@@ -119,7 +178,8 @@ const Navbar = () => {
 							<IconButton
 								variant="ghost"
 								color="gray.600"
-								_hover={{ color: "#1877f2", bg: "gray.100" }}
+								opacity={0.6}
+								cursor="default"
 								aria-label="Watch"
 							>
 								<FiYoutube size={22} />
@@ -195,15 +255,15 @@ const Navbar = () => {
 				<Drawer.Positioner>
 					<Drawer.Content>
 						<Drawer.Body>
-							<VStack gap={4} align="start" mt={8}>
+							<VStack gap={4} align="stretch" mt={8}>
 								<Text fontSize="lg" fontWeight="bold">
 									Menu
 								</Text>
-								<Text>Home</Text>
-								<Text>Friends</Text>
-								<Text>Watch</Text>
-								<Text>Notifications</Text>
-								<Text>Profile</Text>
+								<NavbarDrawerLink to="/home" label="Home" end />
+								<NavbarDrawerLink to="/friends" label="Friends" />
+								<Text opacity={0.6}>Watch</Text>
+								<Text opacity={0.6}>Notifications</Text>
+								<Text opacity={0.6}>Profile</Text>
 							</VStack>
 						</Drawer.Body>
 					</Drawer.Content>
