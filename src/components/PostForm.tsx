@@ -5,6 +5,7 @@ import {
 	Flex,
 	Icon,
 	IconButton,
+	Image,
 	Input,
 	Separator,
 	Text,
@@ -15,13 +16,18 @@ import { FaUserCircle } from "react-icons/fa";
 import { MdVideoCameraBack, MdPhotoLibrary } from "react-icons/md";
 import { HiOutlineEmojiHappy } from "react-icons/hi";
 import { IoClose } from "react-icons/io5";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useCreatePost } from "@/hooks/useCreatePost";
-import type { CreatePost } from "@/entities/CreatePost";
+import type { CreatePostForm } from "@/entities/CreatePost";
 
 const PLACEHOLDER = "What's on your mind, Mark Lester?";
 
-const PostFormActions = () => (
+type PostFormActionsProps = {
+	onPhotoClick?: () => void;
+};
+
+const PostFormActions = ({ onPhotoClick }: PostFormActionsProps) => (
 	<Flex
 		justifyContent="space-between"
 		align="center"
@@ -29,19 +35,25 @@ const PostFormActions = () => (
 		pb="8px"
 		pt="6px"
 	>
-		<Flex align="center" columnGap="3px">
+		<Flex align="center" columnGap="3px" cursor="default" opacity={0.6}>
 			<Icon boxSize="26px" as={MdVideoCameraBack} color="#E42645" />
 			<Text color="#6F7175" fontWeight="500">
 				Live Video
 			</Text>
 		</Flex>
-		<Flex align="center" columnGap="3px">
+		<Flex
+			align="center"
+			columnGap="3px"
+			cursor="pointer"
+			onClick={onPhotoClick}
+			_hover={{ opacity: 0.8 }}
+		>
 			<Icon boxSize="26px" as={MdPhotoLibrary} color="#41B35D" />
 			<Text color="#6F7175" fontWeight="500">
 				Photo/video
 			</Text>
 		</Flex>
-		<Flex align="center" columnGap="3px">
+		<Flex align="center" columnGap="3px" cursor="default" opacity={0.6}>
 			<Icon boxSize="26px" as={HiOutlineEmojiHappy} color="#EAB026" />
 			<Text color="#6F7175" fontWeight="500">
 				Feeling/activity
@@ -53,23 +65,69 @@ const PostFormActions = () => (
 const PostForm = () => {
 	const { open, onOpen, setOpen } = useDisclosure();
 	const createMutation = useCreatePost();
+	const fileInputRef = useRef<HTMLInputElement>(null);
+	const [selectedImage, setSelectedImage] = useState<File | null>(null);
+	const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+	const [formError, setFormError] = useState<string | null>(null);
 
 	const {
 		register,
 		handleSubmit,
 		reset,
-		formState: { errors },
-	} = useForm<CreatePost>({
+	} = useForm<CreatePostForm>({
 		defaultValues: {
 			message: "",
 		},
 	});
 
+	const clearImage = () => {
+		if (previewUrl) URL.revokeObjectURL(previewUrl);
+		setSelectedImage(null);
+		setPreviewUrl(null);
+		if (fileInputRef.current) fileInputRef.current.value = "";
+	};
+
+	const resetForm = () => {
+		reset();
+		clearImage();
+		setFormError(null);
+	};
+
+	useEffect(() => {
+		return () => {
+			if (previewUrl) URL.revokeObjectURL(previewUrl);
+		};
+	}, [previewUrl]);
+
+	const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (!file) return;
+
+		if (previewUrl) URL.revokeObjectURL(previewUrl);
+		setSelectedImage(file);
+		setPreviewUrl(URL.createObjectURL(file));
+		setFormError(null);
+	};
+
 	const openComposer = () => onOpen();
 
-	const onSubmit = async (data: CreatePost) => {
-		await createMutation.mutateAsync(data);
-		reset();
+	const openFilePicker = () => fileInputRef.current?.click();
+
+	const onSubmit = async (data: CreatePostForm) => {
+		const hasText = Boolean(data.message?.trim());
+		const hasImage = selectedImage != null;
+
+		if (!hasText && !hasImage) {
+			setFormError("Add text or a photo to post");
+			return;
+		}
+
+		setFormError(null);
+		await createMutation.mutateAsync({
+			message: data.message?.trim(),
+			image: selectedImage,
+		});
+		resetForm();
 		setOpen(false);
 	};
 
@@ -100,14 +158,22 @@ const PostForm = () => {
 					/>
 				</Flex>
 				<Separator borderColor="gray.200" borderWidth="1px" my={3} />
-				<PostFormActions />
+				<PostFormActions onPhotoClick={openComposer} />
 			</Box>
+
+			<input
+				ref={fileInputRef}
+				type="file"
+				accept="image/*"
+				hidden
+				onChange={handleImageSelect}
+			/>
 
 			<Dialog.Root
 				open={open}
 				onOpenChange={(e) => {
 					setOpen(e.open);
-					if (!e.open) reset();
+					if (!e.open) resetForm();
 				}}
 				placement="center"
 			>
@@ -166,18 +232,44 @@ const PostForm = () => {
 										flex="1"
 										autoFocus
 										_focus={{ outline: "none", boxShadow: "none" }}
-										{...register("message", {
-											required: "Write something to post",
-										})}
+										{...register("message")}
 									/>
 								</Flex>
-								{errors.message && (
+
+								{previewUrl && (
+									<Box position="relative" mt={3}>
+										<Image
+											src={previewUrl}
+											alt="Upload preview"
+											w="full"
+											maxH="400px"
+											objectFit="cover"
+											rounded="lg"
+										/>
+										<IconButton
+											position="absolute"
+											top={2}
+											right={2}
+											aria-label="Remove image"
+											size="sm"
+											rounded="full"
+											bg="gray.800"
+											color="white"
+											_hover={{ bg: "gray.700" }}
+											onClick={clearImage}
+										>
+											<IoClose />
+										</IconButton>
+									</Box>
+								)}
+
+								{formError && (
 									<Text color="red.500" fontSize="sm" mt={1}>
-										{errors.message.message}
+										{formError}
 									</Text>
 								)}
 								<Separator borderColor="gray.200" borderWidth="1px" my={3} />
-								<PostFormActions />
+								<PostFormActions onPhotoClick={openFilePicker} />
 								{createMutation.isError && (
 									<Text color="red.500" fontSize="sm" mt={2}>
 										Failed to create post. Please try again.
