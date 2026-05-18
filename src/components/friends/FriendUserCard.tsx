@@ -4,7 +4,6 @@ import {
 	Icon,
 	Image,
 	Text,
-	VStack,
 } from "@chakra-ui/react";
 import { FaUserCircle } from "react-icons/fa";
 import type { FriendshipStatus } from "@/entities/FriendshipStatus";

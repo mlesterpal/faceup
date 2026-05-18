@@ -27,6 +27,10 @@ export type ProfileHeaderProps = {
 	name?: string;
 	friendCount?: number;
 	details?: ProfileDetail[];
+	avatarUrl?: string | null;
+	onProfilePictureSelected?: (file: File) => void;
+	isUploadingAvatar?: boolean;
+	onProfilePictureError?: (message: string) => void;
 };
 
 export const DEFAULT_PROFILE = {
