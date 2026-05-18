@@ -43,6 +43,7 @@ export type PostCardProps = {
 const PostCardItem = ({ post }: { post: UserPosts }) => {
 
 	const imageSrc = resolveImageUrl(post.imageUrl);
+	const profilePicture = resolveImageUrl(post.profilePicture);
 
 	const hasMessage = Boolean(post.message?.trim());
 
@@ -59,8 +60,11 @@ const PostCardItem = ({ post }: { post: UserPosts }) => {
 					<Flex columnGap="10px" align="center">
 
 						<Circle size="10" bg="gray.200" overflow="hidden">
-
-							<Icon as={FaUserCircle} boxSize="10" color="gray.400" />
+							{profilePicture ? (
+								<Image src={profilePicture} alt="Profile" w="100%" h="100%" />
+							) : (
+								<Icon as={FaUserCircle} boxSize="10" color="gray.400" />
+							)}	
 
 						</Circle>
 
