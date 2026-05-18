@@ -2,15 +2,14 @@
 import {
 	Box,
 	Button,
-	Circle,
 	Flex,
 	HStack,
-	Icon,
 	Separator,
 	Tabs,
 	Text,
 } from "@chakra-ui/react";
-import { FaFacebook, FaGraduationCap, FaUserCircle } from "react-icons/fa";
+import ProfileAvatarMenu from "@/components/profile/ProfileAvatarMenu";
+import { FaFacebook, FaGraduationCap } from "react-icons/fa";
 import {
 	DEFAULT_PROFILE,
 	PROFILE_TABS,
@@ -31,6 +30,10 @@ const ProfileHeader = ({
 	name = DEFAULT_PROFILE.name,
 	friendCount = DEFAULT_PROFILE.friendCount,
 	details = DEFAULT_DETAILS,
+	avatarUrl,
+	onProfilePictureSelected,
+	isUploadingAvatar = false,
+	onProfilePictureError,
 }: ProfileHeaderProps) => {
 	return (
 		<Flex
@@ -40,19 +43,12 @@ const ProfileHeader = ({
 			px={{ base: 4, md: 6 }}
 			py={6}
 		>
-			<Circle
-				size={{ base: "120px", md: "168px" }}
-				bg="gray.200"
-				border="4px solid"
-				borderColor="white"
-				flexShrink={0}
-			>
-				<Icon
-					as={FaUserCircle}
-					boxSize={{ base: "80px", md: "120px" }}
-					color="gray.400"
-				/>
-			</Circle>
+			<ProfileAvatarMenu
+				avatarUrl={avatarUrl}
+				onFileSelected={onProfilePictureSelected ?? (() => undefined)}
+				isUploading={isUploadingAvatar}
+				onValidationError={onProfilePictureError}
+			/>
 
 			<Flex
 				direction="column"
