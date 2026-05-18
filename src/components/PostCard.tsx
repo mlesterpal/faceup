@@ -28,6 +28,7 @@ import { FaRegComment, FaUserCircle } from "react-icons/fa";
 
 import type { UserPosts } from "@/entities/response/UserPosts";
 
+import { formatTimeAgo } from "@/utils/formatTimeAgo";
 import { resolveImageUrl } from "@/utils/resolveImageUrl";
 
 
@@ -87,9 +88,7 @@ const PostCardItem = ({ post }: { post: UserPosts }) => {
 								mt="-0.5"
 
 							>
-
-								Just now
-
+								{formatTimeAgo(post.createdAt)}
 							</Text>
 
 						</VStack>

@@ -4,4 +4,5 @@ export type UserPosts = {
 	firstName: string;
 	imageUrl?: string | null;
 	profilePicture?: string | null;
+	createdAt: string;
 };
