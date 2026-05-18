@@ -3,4 +3,5 @@ export type UserPosts = {
 	message: string;
 	firstName: string;
 	imageUrl?: string | null;
+	profilePicture?: string | null;
 };
