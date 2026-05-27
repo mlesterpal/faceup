@@ -28,6 +28,7 @@ export type ProfileHeaderProps = {
 	friendCount?: number;
 	details?: ProfileDetail[];
 	avatarUrl?: string | null;
+	readOnlyAvatar?: boolean;
 	onProfilePictureSelected?: (file: File) => void;
 	isUploadingAvatar?: boolean;
 	onProfilePictureError?: (message: string) => void;

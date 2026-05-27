@@ -70,7 +70,22 @@ public async Task<IActionResult> CreatePost([FromForm] CreatePostRequest request
 
 ## 5. GET response DTO
 
-Include nullable `imageUrl` in list items returned to the frontend.
+Include nullable `imageUrl` and the post author’s `userId` in list items returned to the frontend.
+
+```csharp
+public class PostListItemDto
+{
+    public int PostId { get; set; }
+    public int UserId { get; set; }
+    public string Message { get; set; } = "";
+    public string? ImageUrl { get; set; }
+    public string FirstName { get; set; } = "";
+    public string? ProfilePicture { get; set; }
+    public DateTime CreatedAt { get; set; }
+}
+```
+
+When mapping from `Post`, set `UserId = post.UserId`. ASP.NET Core serializes this as camelCase `userId` for the React app.
 
 ## 6. Program.cs
 

@@ -224,13 +224,17 @@ const Navbar = () => {
 							</IconButton>
 						</Tooltip>
 						<Tooltip content="Profile" positioning={{ placement: "bottom" }}>
-							<IconButton
-								fontSize="4xl"
-								color="gray.400"
-								rounded="full"
-								aria-label="Profile"
-							>
-								<FaUserCircle />
+							<IconButton asChild fontSize="4xl" color="gray.400" rounded="full" aria-label="Profile">
+								<NavLink
+									to="/profile"
+									style={{
+										display: "flex",
+										alignItems: "center",
+										textDecoration: "none",
+									}}
+								>
+									<FaUserCircle />
+								</NavLink>
 							</IconButton>
 						</Tooltip>
 
@@ -263,7 +267,7 @@ const Navbar = () => {
 								<NavbarDrawerLink to="/friends" label="Friends" />
 								<Text opacity={0.6}>Watch</Text>
 								<Text opacity={0.6}>Notifications</Text>
-								<Text opacity={0.6}>Profile</Text>
+								<NavbarDrawerLink to="/profile" label="Profile" />
 							</VStack>
 						</Drawer.Body>
 					</Drawer.Content>

@@ -31,6 +31,7 @@ const ProfileHeader = ({
 	friendCount = DEFAULT_PROFILE.friendCount,
 	details = DEFAULT_DETAILS,
 	avatarUrl,
+	readOnlyAvatar = false,
 	onProfilePictureSelected,
 	isUploadingAvatar = false,
 	onProfilePictureError,
@@ -45,7 +46,8 @@ const ProfileHeader = ({
 		>
 			<ProfileAvatarMenu
 				avatarUrl={avatarUrl}
-				onFileSelected={onProfilePictureSelected ?? (() => undefined)}
+				readOnly={readOnlyAvatar}
+				onFileSelected={onProfilePictureSelected}
 				isUploading={isUploadingAvatar}
 				onValidationError={onProfilePictureError}
 			/>

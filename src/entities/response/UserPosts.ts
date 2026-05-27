@@ -1,5 +1,6 @@
 export type UserPosts = {
 	postId: number;
+	userId: number;
 	message: string;
 	firstName: string;
 	imageUrl?: string | null;

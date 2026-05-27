@@ -1,9 +1,10 @@
-import { createBrowserRouter } from "react-router-dom"
+import { createBrowserRouter, Navigate } from "react-router-dom"
 import Login from "./components/auth/Login"
 import Signup from "./components/auth/Signup"
 import HomeLayout from "@/layout/HomeLayout"
-import MyPage from "@/components/MyPage"
+import ProfilePage from "@/pages/ProfilePage"
 import FriendsPage from "@/pages/FriendsPage"
+import { CURRENT_USER_ID } from "@/constants/currentUser"
 import FriendRequestsView from "@/components/friends/FriendRequestsView"
 import FriendSuggestionsView from "@/components/friends/FriendSuggestionsView"
 import AllFriendsView from "@/components/friends/AllFriendsView"
@@ -24,8 +25,16 @@ const router = createBrowserRouter([
         element: <HomeLayout />
     },
     {
+        path: "/profile",
+        element: <Navigate to={`/profile/${CURRENT_USER_ID}`} replace />,
+    },
+    {
+        path: "/profile/:userId",
+        element: <ProfilePage />,
+    },
+    {
         path: "/my-page",
-        element: <MyPage />
+        element: <Navigate to={`/profile/${CURRENT_USER_ID}`} replace />,
     },
     {
         path: "/friends",
