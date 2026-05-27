@@ -30,6 +30,7 @@ import type { UserPosts } from "@/entities/response/UserPosts";
 
 import { formatTimeAgo } from "@/utils/formatTimeAgo";
 import { resolveImageUrl } from "@/utils/resolveImageUrl";
+import { Link } from "react-router-dom";
 
 
 
@@ -47,8 +48,35 @@ const PostCardItem = ({ post }: { post: UserPosts }) => {
 	const profilePicture = resolveImageUrl(post.profilePicture);
 
 	const hasMessage = Boolean(post.message?.trim());
+	const canLinkToProfile =
+		typeof post.userId === "number" && Number.isFinite(post.userId);
 
+	const authorHeader = (
+		<Flex columnGap="10px" align="center">
+			<Circle size="10" bg="gray.200" overflow="hidden">
+				{profilePicture ? (
+					<Image src={profilePicture} alt="Profile" w="100%" h="100%" />
+				) : (
+					<Icon as={FaUserCircle} boxSize="10" color="gray.400" />
+				)}
+			</Circle>
 
+			<VStack align="start" gap={0}>
+				<Text color="#080809" fontWeight="500" data-author-name>
+					{post.firstName}
+				</Text>
+
+				<Text
+					fontSize="14px"
+					color="#6F7175"
+					fontWeight="500"
+					mt="-0.5"
+				>
+					{formatTimeAgo(post.createdAt)}
+				</Text>
+			</VStack>
+		</Flex>
+	);
 
 	return (
 
@@ -58,42 +86,22 @@ const PostCardItem = ({ post }: { post: UserPosts }) => {
 
 				<Flex justify="space-between" align="center">
 
-					<Flex columnGap="10px" align="center">
-
-						<Circle size="10" bg="gray.200" overflow="hidden">
-							{profilePicture ? (
-								<Image src={profilePicture} alt="Profile" w="100%" h="100%" />
-							) : (
-								<Icon as={FaUserCircle} boxSize="10" color="gray.400" />
-							)}	
-
-						</Circle>
-
-						<VStack align="start" gap={0}>
-
-							<Text color="#080809" fontWeight="500">
-
-								{post.firstName}
-
-							</Text>
-
-							<Text
-
-								fontSize="14px"
-
-								color="#6F7175"
-
-								fontWeight="500"
-
-								mt="-0.5"
-
+					{canLinkToProfile ? (
+						<Link
+							to={`/profile/${post.userId}`}
+							style={{ textDecoration: "none", color: "inherit" }}
+						>
+							<Box
+								_hover={{
+									"& [data-author-name]": { textDecoration: "underline" },
+								}}
 							>
-								{formatTimeAgo(post.createdAt)}
-							</Text>
-
-						</VStack>
-
-					</Flex>
+								{authorHeader}
+							</Box>
+						</Link>
+					) : (
+						authorHeader
+					)}
 
 
 

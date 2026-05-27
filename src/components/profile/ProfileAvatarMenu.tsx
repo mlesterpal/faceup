@@ -6,13 +6,61 @@ const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 
 type ProfileAvatarMenuProps = {
 	avatarUrl?: string | null;
-	onFileSelected: (file: File) => void;
+	readOnly?: boolean;
+	onFileSelected?: (file: File) => void;
 	isUploading?: boolean;
 	onValidationError?: (message: string) => void;
 };
 
+const ProfileAvatarDisplay = ({
+	displayUrl,
+	isUploading,
+}: {
+	displayUrl: string | null;
+	isUploading: boolean;
+}) => (
+	<Circle
+		size={{ base: "120px", md: "168px" }}
+		bg="gray.200"
+		border="4px solid"
+		borderColor="white"
+		overflow="hidden"
+		position="relative"
+	>
+		{displayUrl ? (
+			<Image
+				src={displayUrl}
+				alt="Profile"
+				w="full"
+				h="full"
+				objectFit="cover"
+			/>
+		) : (
+			<Icon
+				as={FaUserCircle}
+				boxSize={{ base: "80px", md: "120px" }}
+				color="gray.400"
+			/>
+		)}
+
+		{isUploading && (
+			<Box
+				position="absolute"
+				inset={0}
+				bg="blackAlpha.500"
+				display="flex"
+				alignItems="center"
+				justifyContent="center"
+			>
+				<Spinner color="white" size="lg" />
+			</Box>
+		)}
+	</Circle>
+);
+
 const ProfileAvatarMenu = ({
 	avatarUrl,
+	readOnly = false,
 	onFileSelected,
 	isUploading = false,
 	onValidationError,
@@ -58,10 +106,14 @@ const ProfileAvatarMenu = ({
 
 		if (previewUrl) URL.revokeObjectURL(previewUrl);
 		setPreviewUrl(URL.createObjectURL(file));
-		onFileSelected(file);
+		onFileSelected?.(file);
 
 		if (fileInputRef.current) fileInputRef.current.value = "";
 	};
+
+	if (readOnly) {
+		return <ProfileAvatarDisplay displayUrl={displayUrl} isUploading={false} />;
+	}
 
 	return (
 		<>
@@ -87,30 +139,11 @@ const ProfileAvatarMenu = ({
 							},
 						}}
 					>
-						<Circle
-							size={{ base: "120px", md: "168px" }}
-							bg="gray.200"
-							border="4px solid"
-							borderColor="white"
-							overflow="hidden"
-							position="relative"
-						>
-							{displayUrl ? (
-								<Image
-									src={displayUrl}
-									alt="Profile"
-									w="full"
-									h="full"
-									objectFit="cover"
-								/>
-							) : (
-								<Icon
-									as={FaUserCircle}
-									boxSize={{ base: "80px", md: "120px" }}
-									color="gray.400"
-								/>
-							)}
-
+						<Box position="relative">
+							<ProfileAvatarDisplay
+								displayUrl={displayUrl}
+								isUploading={isUploading}
+							/>
 							<Box
 								data-camera-overlay
 								position="absolute"
@@ -122,23 +155,11 @@ const ProfileAvatarMenu = ({
 								justifyContent="center"
 								transition="opacity 0.2s"
 								pointerEvents="none"
+								rounded="full"
 							>
 								<Icon as={FaCamera} boxSize={8} color="white" />
 							</Box>
-
-							{isUploading && (
-								<Box
-									position="absolute"
-									inset={0}
-									bg="blackAlpha.500"
-									display="flex"
-									alignItems="center"
-									justifyContent="center"
-								>
-									<Spinner color="white" size="lg" />
-								</Box>
-							)}
-						</Circle>
+						</Box>
 					</Box>
 				</Menu.Trigger>
 

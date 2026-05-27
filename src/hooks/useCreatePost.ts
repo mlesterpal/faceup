@@ -27,13 +27,13 @@ export const useCreatePost = () => {
 	});
 };
 
-export const useGetPosts = (userId: number) => {
+export const useGetPosts = (userId: number | null) => {
 	return useQuery<UserPosts[]>({
-		queryKey: ["posts", userId],
+		queryKey: ["posts", userId ?? "all"],
 		queryFn: () =>
 			getMyPost
 				.getAll({
-					params: { userId },
+					params: userId != null ? { userId } : {},
 				})
 				.then((res) => res.results),
 	});

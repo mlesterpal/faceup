@@ -6,12 +6,12 @@ This folder holds the Facebook-style profile header and tab bar used on **My Pag
 
 | Question | Answer |
 |----------|--------|
-| Which route? | `src/routes.tsx` → `<MyPage />` |
-| Who owns tabs? | **`MyPage.tsx`** owns `Tabs.Root` and all `Tabs.Content` (posts, placeholders) |
+| Which route? | `src/routes.tsx` → `/profile/:userId` → `<ProfilePage />` |
+| Who owns tabs? | **`ProfilePage.tsx`** owns `Tabs.Root` and all `Tabs.Content` (posts, placeholders) |
 | What does `ProfileHeader.tsx` export? | **`ProfileHeader`** (avatar + info + buttons) and **`ProfileTabList`** (tab row only) |
 | Shared types / tab ids | **`profile.types.ts`** |
 
-`ProfileTabList` must render **inside** the same `Tabs.Root` as the content panels (in `MyPage.tsx`). Do not wrap it in a second `Tabs.Root`.
+`ProfileTabList` must render **inside** the same `Tabs.Root` as the content panels (in `ProfilePage.tsx`). Do not wrap it in a second `Tabs.Root`.
 
 ---
 
@@ -19,7 +19,7 @@ This folder holds the Facebook-style profile header and tab bar used on **My Pag
 
 ```mermaid
 flowchart TB
-  subgraph myPage [MyPage.tsx]
+  subgraph myPage [ProfilePage.tsx]
     tabsRoot[Tabs.Root]
     whiteCard[White card Box]
     grayContent[Box mt=4 on gray bg]
