@@ -1,6 +1,11 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+	useMutation,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
 import axios from "axios";
 import { CURRENT_USER_ID } from "@/constants/currentUser";
+import type { FriendUser } from "@/entities/FriendUser";
 import {
 	acceptFriendRequest,
 	cancelFriendRequest,
@@ -12,6 +17,7 @@ import {
 	sendFriendRequest,
 	unfriend,
 } from "@/services/friendService";
+import type { FriendRequestItem } from "@/entities/FriendRequestItem";
 
 const getErrorMessage = (error: unknown): string => {
 	if (axios.isAxiosError(error)) {
@@ -22,13 +28,25 @@ const getErrorMessage = (error: unknown): string => {
 	return "Something went wrong. Please try again.";
 };
 
-export const useFriends = (userId: number = CURRENT_USER_ID) =>
+export interface IUseFriendsResult {
+	data: FriendUser[] | undefined;
+	isLoading: boolean;
+	isError: boolean;
+}
+
+export const useFriends = (userId: number = CURRENT_USER_ID): IUseFriendsResult =>
 	useQuery({
 		queryKey: ["friends", userId],
 		queryFn: () => getFriends(userId),
 	});
 
-export const useIncomingFriendRequests = (userId: number = CURRENT_USER_ID) =>
+export interface IUseIncomingFriendRequestsResult {
+	data: FriendRequestItem[] | undefined;
+	isLoading: boolean;
+	isError: boolean;
+}
+
+export const useIncomingFriendRequests = (userId: number = CURRENT_USER_ID): IUseIncomingFriendRequestsResult =>
 	useQuery({
 		queryKey: ["friend-incoming", userId],
 		queryFn: () => getIncomingFriendRequests(userId),
