@@ -36,6 +36,8 @@ const ProfileHeader = ({
 	isUploadingAvatar = false,
 	onProfilePictureError,
 }: ProfileHeaderProps) => {
+	const displayName = name.trim() ? name : "User name can't be found";
+
 	return (
 		<Flex
 			direction={{ base: "column", md: "row" }}
@@ -65,7 +67,7 @@ const ProfileHeader = ({
 					color="#080809"
 					textAlign={{ base: "center", md: "left" }}
 				>
-					{name}
+					{displayName}
 				</Text>
 				<Text
 					fontSize="sm"
