@@ -1,9 +1,9 @@
 import { SimpleGrid, Text } from "@chakra-ui/react";
-import FriendUserCard from "@/components/friends/FriendUserCard";
-import FriendsListState from "@/components/friends/FriendsListState";
-import FriendsMainContent from "@/components/friends/FriendsMainContent";
-import { useFriends } from "@/hooks/useFriends";
-import { mapFriendUserToCard } from "@/utils/friendMappers";
+import FriendUserCard from "./FriendUserCard";
+import FriendsListState from "./FriendsListState";
+import FriendsMainContent from "./FriendsMainContent";
+import { useFriends } from "../../hooks/useFriends";
+import { mapFriendUserToCard } from "../../utils/friendMappers";
 
 const AllFriendsView = () => {
 	const { data, isLoading, isError } = useFriends();
