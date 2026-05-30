@@ -12,6 +12,7 @@ import {
 import { FaChevronLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
+import axios from "axios";
 import type { CreateUser } from "@/entities/CreateUser";
 import { useCreateUser } from "@/hooks/useCreateUser";
 
@@ -61,6 +62,38 @@ const CONTROL_PROPS = {
 
 const requiredSelect = { required: "This field is required" };
 
+export const BIRTHDAY_FUTURE_ERROR = "Birthday must be today or earlier.";
+export const EMAIL_ALREADY_REGISTERED_ERROR =
+	"This email is already registered.";
+
+const isEmailAlreadyRegisteredError = (error: unknown): boolean => {
+	if (axios.isAxiosError(error)) {
+		return error.response?.status === 409;
+	}
+
+	return (
+		error instanceof Error &&
+		error.message.toLowerCase().includes("already registered")
+	);
+};
+
+const isBirthDateInFuture = (
+	birthMonth: string,
+	birthDay: string,
+	birthYear: string,
+): boolean => {
+	if (!birthMonth || !birthDay || !birthYear) return false;
+
+	const birthDate = new Date(
+		Number(birthYear),
+		Number(birthMonth) - 1,
+		Number(birthDay),
+	);
+	const today = new Date();
+	today.setHours(23, 59, 59, 999);
+	return birthDate > today;
+};
+
 const Signup = () => {
 	const navigate = useNavigate();
 	const createMutation = useCreateUser();
@@ -69,6 +102,8 @@ const Signup = () => {
 		handleSubmit,
 		control,
 		reset,
+		getValues,
+		setError,
 		formState: { errors },
 	} = useForm<CreateUser>({
 		defaultValues: {
@@ -84,9 +119,15 @@ const Signup = () => {
 	});
 
 	const onSubmit = async (data: CreateUser) => {
-		await createMutation.mutateAsync(data);
-		reset();
-		navigate("/");
+		try {
+			await createMutation.mutateAsync(data);
+			reset();
+			navigate("/");
+		} catch (error) {
+			if (isEmailAlreadyRegisteredError(error)) {
+				setError("email", { message: EMAIL_ALREADY_REGISTERED_ERROR });
+			}
+		}
 	};
 
 	return (
@@ -208,7 +249,20 @@ const Signup = () => {
 									<Controller
 										name="birthYear"
 										control={control}
-										rules={requiredSelect}
+										rules={{
+											...requiredSelect,
+											validate: () => {
+												const { birthMonth, birthDay, birthYear } =
+													getValues();
+												return (
+													!isBirthDateInFuture(
+														birthMonth,
+														birthDay,
+														birthYear,
+													) || BIRTHDAY_FUTURE_ERROR
+												);
+											},
+										}}
 										render={({ field }) => (
 											<NativeSelect.Field
 												{...field}
@@ -324,7 +378,7 @@ const Signup = () => {
 							)}
 						</Field.Root>
 					</Flex>
-					{createMutation.isError && (
+					{createMutation.isError && !errors.email && (
 						<Text mt="2" color="red.500" fontSize="sm">
 							Sign up failed. Please try again.
 						</Text>
