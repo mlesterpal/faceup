@@ -65,6 +65,7 @@ const requiredSelect = { required: "This field is required" };
 export const BIRTHDAY_FUTURE_ERROR = "Birthday must be today or earlier.";
 export const EMAIL_ALREADY_REGISTERED_ERROR =
 	"This email is already registered.";
+export const PASSWORD_NOT_MATCH_ERROR = "Passwords do not match.";
 
 const isEmailAlreadyRegisteredError = (error: unknown): boolean => {
 	if (axios.isAxiosError(error)) {
@@ -75,6 +76,10 @@ const isEmailAlreadyRegisteredError = (error: unknown): boolean => {
 		error instanceof Error &&
 		error.message.toLowerCase().includes("already registered")
 	);
+};
+
+const isPasswordNotMatchError = (error: unknown): boolean => {
+	return error instanceof Error && error.message.toLowerCase().includes("passwords do not match");
 };
 
 const isBirthDateInFuture = (
@@ -99,7 +104,7 @@ const Signup = () => {
 	const createMutation = useCreateUser();
 	const {
 		register,
-		handleSubmit,
+		handleSubmit,  
 		control,
 		reset,
 		getValues,
@@ -127,7 +132,13 @@ const Signup = () => {
 			if (isEmailAlreadyRegisteredError(error)) {
 				setError("email", { message: EMAIL_ALREADY_REGISTERED_ERROR });
 			}
-		}
+			else if(isPasswordNotMatchError(error)){
+				setError("password", { message: PASSWORD_NOT_MATCH_ERROR });
+			}
+			else {
+				setError("email", { message: "Sign up failed. Please try again." });
+			}
+		}	
 	};
 
 	return (
