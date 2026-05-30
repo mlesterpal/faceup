@@ -7,6 +7,7 @@ import { MemoryRouter } from "react-router-dom";
 import Signup, {
 	BIRTHDAY_FUTURE_ERROR,
 	EMAIL_ALREADY_REGISTERED_ERROR,
+    PASSWORD_NOT_MATCH_ERROR,
 } from "./Signup";
 import { useCreateUser } from "../../hooks/useCreateUser";
 
@@ -96,5 +97,24 @@ describe("Signup", () => {
 		expect(
 			screen.getByText(EMAIL_ALREADY_REGISTERED_ERROR),
 		).toBeInTheDocument();
+	});
+
+	it("show validation message when passwords do not match", async () => {
+		const user = userEvent.setup();
+		// isPasswordNotMatchError only checks error.message (not response.data)
+		const passwordNotMatchError = new axios.AxiosError(
+			"passwords do not match",
+		);
+
+		vi.mocked(useCreateUser).mockReturnValue({
+			isError: true,
+			isPending: false,
+			mutateAsync: vi.fn().mockRejectedValue(passwordNotMatchError),
+		} as unknown as ReturnType<typeof useCreateUser>);
+
+		renderSignup();
+		await fillValidSignupForm(user);
+		await user.click(screen.getByRole("button", { name: "Submit" }));
+		expect(screen.getByText(PASSWORD_NOT_MATCH_ERROR)).toBeInTheDocument();
 	});
 });

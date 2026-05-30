@@ -11,28 +11,55 @@ import {
 } from "@chakra-ui/react";
 import logo from "../../assets/login.webp";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import axios from "axios";
+import { useForm } from "react-hook-form";
+import type { LoginData } from "@/entities/LoginData";
+import { useLogin } from "@/hooks/useAuth";
 
 export const LOGIN_EMAIL_ERROR = "Please enter a valid email";
+export const LOGIN_EMAIL_NOT_FOUND_ERROR = "User not found.";
+export const PASSWORD_NOT_MATCH_ERROR = "Passwords do not match";
 
-const isValidEmail = (value: string) =>
-	/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+const isPasswordDontMatch = (error: unknown): boolean => {
+	return error instanceof Error && error.message.toLowerCase().includes("passwords do not match");
+};
 
 const Login = () => {
 	const navigate = useNavigate();
-	const [email, setEmail] = useState("");
-	const [emailError, setEmailError] = useState<string | null>(null);
+	const loginMutation = useLogin();
+	const {
+		register,
+		handleSubmit,
+		reset,
+		setError,
+		formState: { errors },
+	} = useForm<LoginData>({
+		defaultValues: {
+			email: "",
+			password: "",
+		},
+	});
 
 	const handleSignup = () => {
 		navigate("/signup");
 	};
 
-	const handleLogin = () => {
-		if (!isValidEmail(email)) {
-			setEmailError(LOGIN_EMAIL_ERROR);
-			return;
+	const onSubmit = async (data: LoginData) => {
+		try {
+			await loginMutation.mutateAsync(data);
+			reset();
+			navigate("/home");
+		} catch (error) {
+			if (axios.isAxiosError(error) && error.response?.status === 401) {
+				setError("password", { message: PASSWORD_NOT_MATCH_ERROR });
+			} else if (axios.isAxiosError(error) && error.response?.status === 404) {
+				setError("email", { message: LOGIN_EMAIL_NOT_FOUND_ERROR });
+			} else if(isPasswordDontMatch(error)){
+				setError("password", { message: PASSWORD_NOT_MATCH_ERROR });
+			} else {
+				setError("email", { message: "Login failed. Please try again." });
+			}
 		}
-		setEmailError(null);
 	};
 
 	return (
@@ -95,54 +122,70 @@ const Login = () => {
 					<Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="medium" mb={6}>
 						Login into FaceUp
 					</Text>
-					<Stack gap={4}>
-						<Input
-							placeholder="Email"
-							value={email}
-							onChange={(e) => setEmail(e.target.value)}
-							rounded="xl"
-							h="52px"
-							px="16px"
-						/>
-						{emailError && (
-							<Text color="red.500" fontSize="sm" role="alert">
-								{emailError}
+					<form onSubmit={handleSubmit(onSubmit)} noValidate>
+						<Stack gap={4}>
+							<Input
+								placeholder="Email"
+								rounded="xl"
+								h="52px"
+								px="16px"
+								{...register("email", {
+									required: LOGIN_EMAIL_ERROR,
+									pattern: {
+										value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+										message: LOGIN_EMAIL_ERROR,
+									},
+								})}
+							/>
+							{errors.email && (
+								<Text color="red.500" fontSize="sm" role="alert">
+									{errors.email.message}
+								</Text>
+							)}
+							<Input
+								placeholder="Password"
+								rounded="xl"
+								h="52px"
+								px="16px"
+								type="password"
+								{...register("password", {
+									required: "Password is required",
+								})}
+							/>
+							{errors.password && (
+								<Text color="red.500" fontSize="sm" role="alert">
+									{errors.password.message}
+								</Text>
+							)}
+							<Button
+								type="submit"
+								bg="blue.600"
+								color="white"
+								rounded="3xl"
+								fontSize="md"
+								h="52px"
+								disabled={loginMutation.isPending}
+							>
+								Login
+							</Button>
+							<Text textAlign="center" mt="1" mb="2">
+								Forgot Password?
 							</Text>
-						)}
-						<Input
-							placeholder="Password"
-							rounded="xl"
-							h="52px"
-							px="16px"
-							type="password"
-						/>
-						<Button
-							type="button"
-							onClick={handleLogin}
-							bg="blue.600"
-							color="white"
-							rounded="3xl"
-							fontSize="md"
-							h="52px"
-						>
-							Login
-						</Button>
-						<Text textAlign="center" mt="1" mb="2">
-							Forgot Password?
-						</Text>
-						<Button
-							border="1px solid"
-							bg="none"
-							color="blue.500"
-							fontSize="md"
-							h="52px"
-							borderColor="blue.600"
-							rounded="3xl"
-							onClick={handleSignup}
-						>
-							Create new Account
-						</Button>
-					</Stack>
+							<Button
+								type="button"
+								border="1px solid"
+								bg="none"
+								color="blue.500"
+								fontSize="md"
+								h="52px"
+								borderColor="blue.600"
+								rounded="3xl"
+								onClick={handleSignup}
+							>
+								Create new Account
+							</Button>
+						</Stack>
+					</form>
 				</Box>
 			</Flex>
 		</Grid>
