@@ -1,35 +1,12 @@
-import {
-
-	Box,
-
-	Circle,
-
-	Flex,
-
-	Icon,
-
-	Image,
-
-	Text,
-
-	VStack,
-
-} from "@chakra-ui/react";
-
+import { Box, Circle, Flex, Icon, Image, Text, VStack } from "@chakra-ui/react";
 import { HiDotsHorizontal } from "react-icons/hi";
-
 import { IoClose } from "react-icons/io5";
-
 import { BiSolidHeartCircle, BiLike } from "react-icons/bi";
-
 import { PiThumbsUpFill, PiShareFat } from "react-icons/pi";
-
 import { FaRegComment, FaUserCircle } from "react-icons/fa";
-
-import type { UserPosts } from "@/entities/response/UserPosts";
-
-import { formatTimeAgo } from "@/utils/formatTimeAgo";
-import { resolveImageUrl } from "@/utils/resolveImageUrl";
+import type { UserPosts } from "../../entities/response/UserPosts";
+import { formatTimeAgo } from "../../utils/formatTimeAgo";
+import { resolveImageUrl } from "../../utils/resolveImageUrl";
 import { Link } from "react-router-dom";
 
 

@@ -3,7 +3,7 @@ import { Provider } from "../ui/provider";
 import FriendRequestsView from "./FriendRequestsView";
 import { MemoryRouter } from "react-router-dom";
 import { vi } from "vitest";
-import { type IUseIncomingFriendRequestsResult, useIncomingFriendRequests } from "../../hooks/useFriends";
+import { type IUseIncomingFriendRequestsResult, useIncomingFriendRequests } from "../../hooks/FriendRepository";
 
 const renderFriendRequestView = () =>
 	render(
@@ -14,7 +14,7 @@ const renderFriendRequestView = () =>
 		</Provider>,
 	);
 
-vi.mock("../../hooks/useFriends", () => ({   
+vi.mock("../../hooks/FriendRepository", () => ({
     useIncomingFriendRequests: vi.fn(),
 }));
 

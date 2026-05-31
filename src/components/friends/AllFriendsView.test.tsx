@@ -3,12 +3,12 @@ import { MemoryRouter } from "react-router-dom";
 import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { vi, beforeEach, afterEach, describe, expect, it } from "vitest";
 import { Provider } from "../ui/provider";
-import type { FriendUser } from "../../entities/FriendUser";
-import { useFriends, type IUseFriendsResult } from "../../hooks/useFriends";
+import type { FriendUser } from "../../entities/response/FriendUser";
+import { useFriends, type IUseFriendsResult } from "../../hooks/FriendRepository";
 import AllFriendsView from "./AllFriendsView";
 import FriendUserCard from "./FriendUserCard";
 
-vi.mock("../../hooks/useFriends", () => ({
+vi.mock("../../hooks/FriendRepository", () => ({
 	useFriends: vi.fn(),
 }));
 

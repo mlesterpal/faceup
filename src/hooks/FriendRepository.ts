@@ -1,23 +1,9 @@
-import {
-	useMutation,
-	useQuery,
-	useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { CURRENT_USER_ID } from "@/constants/currentUser";
-import type { FriendUser } from "@/entities/FriendUser";
-import {
-	acceptFriendRequest,
-	cancelFriendRequest,
-	getFriendSuggestions,
-	getFriends,
-	getIncomingFriendRequests,
-	getOutgoingFriendRequests,
-	rejectFriendRequest,
-	sendFriendRequest,
-	unfriend,
-} from "@/services/friendService";
-import type { FriendRequestItem } from "@/entities/FriendRequestItem";
+import { CURRENT_USER_ID } from "../constants/currentUser";
+import type { FriendUser } from "../entities/response/FriendUser";
+import { acceptFriendRequest, cancelFriendRequest, getFriendSuggestions, getFriends, getIncomingFriendRequests, getOutgoingFriendRequests, rejectFriendRequest, sendFriendRequest, unfriend } from "../services/friendService";
+import type { FriendRequestItem } from "../entities/response/FriendRequestItem";
 
 const getErrorMessage = (error: unknown): string => {
 	if (axios.isAxiosError(error)) {
@@ -34,7 +20,9 @@ export interface IUseFriendsResult {
 	isError: boolean;
 }
 
-export const useFriends = (userId: number = CURRENT_USER_ID): IUseFriendsResult =>
+export const useFriends = (
+	userId: number = CURRENT_USER_ID,
+): IUseFriendsResult =>
 	useQuery({
 		queryKey: ["friends", userId],
 		queryFn: () => getFriends(userId),
@@ -46,19 +34,25 @@ export interface IUseIncomingFriendRequestsResult {
 	isError: boolean;
 }
 
-export const useIncomingFriendRequests = (userId: number = CURRENT_USER_ID): IUseIncomingFriendRequestsResult =>
+export const useIncomingFriendRequests = (
+	userId: number = CURRENT_USER_ID,
+): IUseIncomingFriendRequestsResult =>
 	useQuery({
 		queryKey: ["friend-incoming", userId],
 		queryFn: () => getIncomingFriendRequests(userId),
 	});
 
-export const useOutgoingFriendRequests = (userId: number = CURRENT_USER_ID) =>
+export const useOutgoingFriendRequests = (
+	userId: number = CURRENT_USER_ID,
+) =>
 	useQuery({
 		queryKey: ["friend-outgoing", userId],
 		queryFn: () => getOutgoingFriendRequests(userId),
 	});
 
-export const useFriendSuggestions = (userId: number = CURRENT_USER_ID) =>
+export const useFriendSuggestions = (
+	userId: number = CURRENT_USER_ID,
+) =>
 	useQuery({
 		queryKey: ["friend-suggestions", userId],
 		queryFn: () => getFriendSuggestions(userId),

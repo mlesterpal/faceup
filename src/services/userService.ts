@@ -1,5 +1,5 @@
-import { axiosInstance } from "@/services/apiClient";
-import type { User } from "@/entities/User";
+import { axiosInstance } from "./apiClient";
+import type { User } from "../entities/response/User";
 
 export const getUser = (userId: number) =>
 	axiosInstance.get<User>(`/user/${userId}`).then((res) => res.data);

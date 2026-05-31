@@ -1,15 +1,8 @@
 import { Box, Flex, Icon, IconButton, Text } from "@chakra-ui/react";
-import {
-	FaBirthdayCake,
-	FaChevronRight,
-	FaHome,
-	FaList,
-	FaUserFriends,
-	FaUserPlus,
-} from "react-icons/fa";
+import { FaBirthdayCake, FaChevronRight, FaHome, FaList, FaUserFriends, FaUserPlus } from "react-icons/fa";
 import { FiSettings } from "react-icons/fi";
 import { NavLink } from "react-router-dom";
-import type { FriendsNavItem } from "@/components/friends/friends.types";
+import type { FriendsNavItem } from "./friends.types";
 
 const FRIENDS_NAV_ITEMS: FriendsNavItem[] = [
 	{ id: "home", label: "Home", icon: <FaHome />, to: "/friends" },

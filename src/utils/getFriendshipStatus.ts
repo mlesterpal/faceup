@@ -1,6 +1,6 @@
-import type { FriendshipStatus } from "@/entities/FriendshipStatus";
-import type { FriendRequestItem } from "@/entities/FriendRequestItem";
-import type { FriendUser } from "@/entities/FriendUser";
+import type { FriendshipStatus } from "../entities/FriendshipStatus";
+import type { FriendRequestItem } from "../entities/response/FriendRequestItem";
+import type { FriendUser } from "../entities/response/FriendUser";
 
 export const getFriendshipStatus = (
 	targetUserId: number,

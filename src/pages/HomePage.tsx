@@ -1,13 +1,14 @@
 import { Box, Grid, GridItem, Spinner, Text } from "@chakra-ui/react";
-import Navbar from "@/components/Navbar";
-import PostForm from "@/components/PostForm";
-import PostCard from "@/components/PostCard";
-import LeftHome from "@/components/LeftHome";
-import { useGetPosts } from "@/hooks/useCreatePost";
+import Navbar from "../components/home/Navbar";
+import PostForm from "../components/home/PostForm";
+import PostCard from "../components/home/PostCard";
+import LeftHome from "../components/home/LeftHome";
+import { useGetPosts } from "../hooks/PostRepository";
+import { toHomeFeedPosts } from "../components/home/HomeWorker";
 
-const HomeLayout = () => {
+const HomePage = () => {
 	const { data, isLoading, isError } = useGetPosts(null);
-	const userPosts = data ?? [];
+	const userPosts = toHomeFeedPosts(data);
 
 	return (
 		<Box>
@@ -51,4 +52,4 @@ const HomeLayout = () => {
 	);
 };
 
-export default HomeLayout;
+export default HomePage;

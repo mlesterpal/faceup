@@ -1,20 +1,10 @@
-import {
-	Box,
-	Field,
-	Flex,
-	Heading,
-	Text,
-	Input,
-	NativeSelect,
-	Button,
-	IconButton,
-} from "@chakra-ui/react";
+import { Box, Field, Flex, Heading, Text, Input, NativeSelect, Button, IconButton } from "@chakra-ui/react";
 import { FaChevronLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
-import axios from "axios";
-import type { CreateUser } from "@/entities/CreateUser";
-import { useCreateUser } from "@/hooks/useCreateUser";
+import type { CreateUser } from "../../entities/post/CreateUser";
+import { useCreateUser } from "../../hooks/UserRepository";
+import { BIRTHDAY_FUTURE_ERROR, EMAIL_ALREADY_REGISTERED_ERROR, EMAIL_REGEX, isBirthDateInFuture, mapSignupErrorToField, PASSWORD_NOT_MATCH_ERROR } from "./AuthWorker";
 
 const MONTH_OPTIONS = [
 	{ value: "1", label: "January" },
@@ -62,43 +52,6 @@ const CONTROL_PROPS = {
 
 const requiredSelect = { required: "This field is required" };
 
-export const BIRTHDAY_FUTURE_ERROR = "Birthday must be today or earlier.";
-export const EMAIL_ALREADY_REGISTERED_ERROR =
-	"This email is already registered.";
-export const PASSWORD_NOT_MATCH_ERROR = "Passwords do not match.";
-
-const isEmailAlreadyRegisteredError = (error: unknown): boolean => {
-	if (axios.isAxiosError(error)) {
-		return error.response?.status === 409;
-	}
-
-	return (
-		error instanceof Error &&
-		error.message.toLowerCase().includes("already registered")
-	);
-};
-
-const isPasswordNotMatchError = (error: unknown): boolean => {
-	return error instanceof Error && error.message.toLowerCase().includes("passwords do not match");
-};
-
-const isBirthDateInFuture = (
-	birthMonth: string,
-	birthDay: string,
-	birthYear: string,
-): boolean => {
-	if (!birthMonth || !birthDay || !birthYear) return false;
-
-	const birthDate = new Date(
-		Number(birthYear),
-		Number(birthMonth) - 1,
-		Number(birthDay),
-	);
-	const today = new Date();
-	today.setHours(23, 59, 59, 999);
-	return birthDate > today;
-};
-
 const Signup = () => {
 	const navigate = useNavigate();
 	const createMutation = useCreateUser();
@@ -129,15 +82,8 @@ const Signup = () => {
 			reset();
 			navigate("/");
 		} catch (error) {
-			if (isEmailAlreadyRegisteredError(error)) {
-				setError("email", { message: EMAIL_ALREADY_REGISTERED_ERROR });
-			}
-			else if(isPasswordNotMatchError(error)){
-				setError("password", { message: PASSWORD_NOT_MATCH_ERROR });
-			}
-			else {
-				setError("email", { message: "Sign up failed. Please try again." });
-			}
+			const fieldError = mapSignupErrorToField(error);
+			setError(fieldError.field, { message: fieldError.message });
 		}	
 	};
 
@@ -353,7 +299,7 @@ const Signup = () => {
 									{...register("email", {
 										required: "Email is required",
 										pattern: {
-											value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+											value: EMAIL_REGEX,
 											message: "Enter a valid email",
 										},
 									})}
@@ -416,3 +362,8 @@ const Signup = () => {
 };
 
 export default Signup;
+export {
+	BIRTHDAY_FUTURE_ERROR,
+	EMAIL_ALREADY_REGISTERED_ERROR,
+	PASSWORD_NOT_MATCH_ERROR,
+};

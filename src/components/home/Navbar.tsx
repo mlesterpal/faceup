@@ -1,16 +1,4 @@
-import {
-	Box,
-	Drawer,
-	Grid,
-	GridItem,
-	HStack,
-	IconButton,
-	Input,
-	InputGroup,
-	Text,
-	VStack,
-	useDisclosure,
-} from "@chakra-ui/react";
+import { Box, Drawer, Grid, GridItem, HStack, IconButton, Input, InputGroup, Text, VStack, useDisclosure } from "@chakra-ui/react";
 import type { ComponentType } from "react";
 import { FaBell, FaBars, FaSearch } from "react-icons/fa";
 import { GoHome } from "react-icons/go";
@@ -21,7 +9,7 @@ import { FiYoutube } from "react-icons/fi";
 import { BsFillGrid3X3GapFill } from "react-icons/bs";
 import { FaFacebookMessenger, FaUserCircle } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
-import { Tooltip } from "@/components/ui/tooltip";
+import { Tooltip } from "../ui/tooltip";
 
 const CENTER_NAV_ITEMS = [
 	{ id: "home", label: "Home", to: "/home", icon: GoHome, end: true },

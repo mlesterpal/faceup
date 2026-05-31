@@ -1,25 +1,13 @@
-import {
-	Box,
-	Button,
-	Dialog,
-	Flex,
-	Icon,
-	IconButton,
-	Image,
-	Input,
-	Separator,
-	Text,
-	Textarea,
-	useDisclosure,
-} from "@chakra-ui/react";
+import { Box, Button, Dialog, Flex, Icon, IconButton, Image, Input, Separator, Text, Textarea, useDisclosure } from "@chakra-ui/react";
 import { FaUserCircle } from "react-icons/fa";
 import { MdVideoCameraBack, MdPhotoLibrary } from "react-icons/md";
 import { HiOutlineEmojiHappy } from "react-icons/hi";
 import { IoClose } from "react-icons/io5";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useCreatePost } from "@/hooks/useCreatePost";
-import type { CreatePostForm } from "@/entities/CreatePost";
+import { useCreatePost } from "../../hooks/PostRepository";
+import type { CreatePostForm } from "../../entities/post/CreatePost";
+import { EMPTY_POST_ERROR, toCreatePostPayload } from "./HomeWorker";
 
 const PLACEHOLDER = "What's on your mind, Mark Lester?";
 
@@ -114,19 +102,14 @@ const PostForm = () => {
 	const openFilePicker = () => fileInputRef.current?.click();
 
 	const onSubmit = async (data: CreatePostForm) => {
-		const hasText = Boolean(data.message?.trim());
-		const hasImage = selectedImage != null;
-
-		if (!hasText && !hasImage) {
-			setFormError("Add text or a photo to post");
+		const { hasContent, payload } = toCreatePostPayload(data, selectedImage);
+		if (!hasContent) {
+			setFormError(EMPTY_POST_ERROR);
 			return;
 		}
 
 		setFormError(null);
-		await createMutation.mutateAsync({
-			message: data.message?.trim(),
-			image: selectedImage,
-		});
+		await createMutation.mutateAsync(payload);
 		resetForm();
 		setOpen(false);
 	};

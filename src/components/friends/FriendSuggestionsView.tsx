@@ -1,35 +1,28 @@
 import { SimpleGrid, Text } from "@chakra-ui/react";
-import FriendUserCard from "@/components/friends/FriendUserCard";
-import FriendsListState from "@/components/friends/FriendsListState";
-import FriendsMainContent from "@/components/friends/FriendsMainContent";
-import {
-	useFriendSuggestions,
-	useFriends,
-	useOutgoingFriendRequests,
-} from "@/hooks/useFriends";
-import { mapFriendSuggestionToCard } from "@/utils/friendMappers";
-import {
-	getFriendshipStatus,
-	getOutgoingFriendshipId,
-} from "@/utils/getFriendshipStatus";
+import FriendUserCard from "./FriendUserCard";
+import FriendsListState from "./FriendsListState";
+import FriendsMainContent from "./FriendsMainContent";
+import { useFriendSuggestions, useFriends, useOutgoingFriendRequests } from "../../hooks/FriendRepository";
+import { buildSuggestionCards, getSuggestionsState } from "./FriendsWorker";
 
 const FriendSuggestionsView = () => {
 	const suggestionsQuery = useFriendSuggestions();
 	const outgoingQuery = useOutgoingFriendRequests();
 	const friendsQuery = useFriends();
 
-	const isLoading =
-		suggestionsQuery.isLoading ||
-		outgoingQuery.isLoading ||
-		friendsQuery.isLoading;
-	const isError =
-		suggestionsQuery.isError ||
-		outgoingQuery.isError ||
-		friendsQuery.isError;
+	const { isLoading, isError } = getSuggestionsState({
+		suggestionsLoading: suggestionsQuery.isLoading,
+		outgoingLoading: outgoingQuery.isLoading,
+		friendsLoading: friendsQuery.isLoading,
+		suggestionsError: suggestionsQuery.isError,
+		outgoingError: outgoingQuery.isError,
+		friendsError: friendsQuery.isError,
+	});
 
 	const suggestions = suggestionsQuery.data ?? [];
 	const outgoing = outgoingQuery.data ?? [];
 	const friends = friendsQuery.data ?? [];
+	const suggestionCards = buildSuggestionCards(suggestions, outgoing, friends);
 
 	return (
 		<FriendsMainContent>
@@ -47,29 +40,13 @@ const FriendSuggestionsView = () => {
 					columns={{ base: 2, sm: 3, md: 4, lg: 5, xl: 6, "2xl": 7 }}
 					gap={4}
 				>
-					{suggestions.map((user) => {
-						const status = getFriendshipStatus(
-							user.userId,
-							outgoing,
-							friends,
-						);
-						const card = mapFriendSuggestionToCard(user);
-						const outgoingFriendshipId = getOutgoingFriendshipId(
-							user.userId,
-							outgoing,
-						);
-
-						return (
-							<FriendUserCard
-								key={user.userId}
-								user={{
-									...card,
-									friendshipId: outgoingFriendshipId,
-								}}
-								status={status}
-							/>
-						);
-					})}
+					{suggestionCards.map((card) => (
+						<FriendUserCard
+							key={card.id}
+							user={card.user}
+							status={card.status}
+						/>
+					))}
 				</SimpleGrid>
 			</FriendsListState>
 		</FriendsMainContent>

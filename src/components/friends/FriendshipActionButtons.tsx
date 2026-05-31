@@ -1,13 +1,7 @@
 import { Button, VStack } from "@chakra-ui/react";
-import type { FriendshipStatus } from "@/entities/FriendshipStatus";
-import {
-	useAcceptFriendRequest,
-	useCancelFriendRequest,
-	useRejectFriendRequest,
-	useSendFriendRequest,
-	useUnfriend,
-	getErrorMessage,
-} from "@/hooks/useFriends";
+import type { FriendshipStatus } from "./FriendshipStatus";
+import { useAcceptFriendRequest, useCancelFriendRequest, useRejectFriendRequest, useSendFriendRequest, useUnfriend, getErrorMessage } from "../../hooks/FriendRepository";
+import { isAnyFriendActionPending } from "./FriendsWorker";
 
 type FriendshipActionButtonsProps = {
 	status: FriendshipStatus;
@@ -28,12 +22,13 @@ const FriendshipActionButtons = ({
 	const rejectRequest = useRejectFriendRequest();
 	const unfriendMutation = useUnfriend();
 
-	const isPending =
-		sendRequest.isPending ||
-		cancelRequest.isPending ||
-		acceptRequest.isPending ||
-		rejectRequest.isPending ||
-		unfriendMutation.isPending;
+	const isPending = isAnyFriendActionPending([
+		sendRequest.isPending,
+		cancelRequest.isPending,
+		acceptRequest.isPending,
+		rejectRequest.isPending,
+		unfriendMutation.isPending,
+	]);
 
 	const handleError = (error: unknown) => {
 		window.alert(getErrorMessage(error));

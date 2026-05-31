@@ -8,7 +8,7 @@ Facebook-style Friends management UI at route **`/friends`**, wired to **`/api/f
 |----------|--------|
 | Route | `/friends` with nested child routes |
 | Page shell | [`FriendsPage.tsx`](../../pages/FriendsPage.tsx) — Navbar + sidebar + `<Outlet />` |
-| API layer | [`friendService.ts`](../../services/friendService.ts), [`useFriends.ts`](../../hooks/useFriends.ts) |
+| API layer | [`friendService.ts`](../../services/friendService.ts), [`FriendRepository.ts`](../../hooks/FriendRepository.ts) |
 | Current user | [`CURRENT_USER_ID`](../../constants/currentUser.ts) |
 
 ## Mock routing (path → view)
@@ -28,7 +28,7 @@ Facebook-style Friends management UI at route **`/friends`**, wired to **`/api/f
 | File | Role |
 |------|------|
 | `friends.types.ts` | UI types |
-| `friendService.ts` / `useFriends.ts` | API + TanStack Query |
+| `friendService.ts` / `FriendRepository.ts` | API + TanStack Query |
 | `FriendshipActionButtons.tsx` | State-based actions |
 | `FriendUserCard.tsx` | Card with actions |
 | `FriendRequestCard.tsx` | Incoming-only card |

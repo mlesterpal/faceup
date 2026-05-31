@@ -1,13 +1,14 @@
 import { SimpleGrid, Text } from "@chakra-ui/react";
-import FriendUserCard from "@/components/friends/FriendUserCard";
-import FriendsListState from "@/components/friends/FriendsListState";
-import FriendsMainContent from "@/components/friends/FriendsMainContent";
-import { useOutgoingFriendRequests } from "@/hooks/useFriends";
-import { mapFriendRequestItemToCard } from "@/utils/friendMappers";
+import FriendUserCard from "./FriendUserCard";
+import FriendsListState from "./FriendsListState";
+import FriendsMainContent from "./FriendsMainContent";
+import { useOutgoingFriendRequests } from "../../hooks/FriendRepository";
+import { mapOutgoingRequestCards } from "./FriendsWorker";
 
 const OutgoingRequestsView = () => {
 	const { data, isLoading, isError } = useOutgoingFriendRequests();
 	const requests = data ?? [];
+	const outgoingCards = mapOutgoingRequestCards(requests);
 
 	return (
 		<FriendsMainContent>
@@ -25,10 +26,10 @@ const OutgoingRequestsView = () => {
 					columns={{ base: 2, sm: 3, md: 4, lg: 5, xl: 6, "2xl": 7 }}
 					gap={4}
 				>
-					{requests.map((request) => (
+					{outgoingCards.map(({ id, user }) => (
 						<FriendUserCard
-							key={request.friendshipId}
-							user={mapFriendRequestItemToCard(request)}
+							key={id}
+							user={user}
 							status="pending_outgoing"
 						/>
 					))}
