@@ -1,8 +1,7 @@
 import { Box, Circle, Icon, Image, Menu, Spinner } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import { FaCamera, FaUserCircle } from "react-icons/fa";
-
-const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
+import { getProfileImageValidationError } from "./ProfileWorker";
 
 type ProfileAvatarMenuProps = {
 	avatarUrl?: string | null;
@@ -91,15 +90,9 @@ const ProfileAvatarMenu = ({
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
-
-		if (!file.type.startsWith("image/")) {
-			onValidationError?.("Please choose an image file.");
-			if (fileInputRef.current) fileInputRef.current.value = "";
-			return;
-		}
-
-		if (file.size > MAX_FILE_SIZE_BYTES) {
-			onValidationError?.("Image must be 5 MB or smaller.");
+		const validationError = getProfileImageValidationError(file);
+		if (validationError) {
+			onValidationError?.(validationError);
 			if (fileInputRef.current) fileInputRef.current.value = "";
 			return;
 		}

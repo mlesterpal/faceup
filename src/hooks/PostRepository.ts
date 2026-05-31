@@ -1,7 +1,7 @@
-import APIClient from "@/services/apiClient";
-import type { CreatePostPayload } from "@/entities/CreatePost";
+import APIClient from "../services/apiClient";
+import type { CreatePostPayload } from "../entities/post/CreatePost";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { UserPosts } from "@/entities/response/UserPosts";
+import type { UserPosts } from "../entities/response/UserPosts";
 
 const createPost = new APIClient<UserPosts>("/post");
 const getMyPost = new APIClient<UserPosts>("/post");

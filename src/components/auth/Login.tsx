@@ -1,28 +1,10 @@
-import {
-	Box,
-	Image,
-	Flex,
-	Text,
-	Grid,
-	Span,
-	Input,
-	Stack,
-	Button,
-} from "@chakra-ui/react";
+import { Box, Image, Flex, Text, Grid, Span, Input, Stack, Button } from "@chakra-ui/react";
 import logo from "../../assets/login.webp";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { useForm } from "react-hook-form";
-import type { LoginData } from "@/entities/LoginData";
-import { useLogin } from "@/hooks/useAuth";
-
-export const LOGIN_EMAIL_ERROR = "Please enter a valid email";
-export const LOGIN_EMAIL_NOT_FOUND_ERROR = "User not found.";
-export const PASSWORD_NOT_MATCH_ERROR = "Passwords do not match";
-
-const isPasswordDontMatch = (error: unknown): boolean => {
-	return error instanceof Error && error.message.toLowerCase().includes("passwords do not match");
-};
+import type { LoginData } from "../../entities/post/LoginData";
+import { useLogin } from "../../hooks/AuthRepository";
+import { EMAIL_REGEX, LOGIN_EMAIL_ERROR, mapLoginErrorToField } from "./AuthWorker";
 
 const Login = () => {
 	const navigate = useNavigate();
@@ -50,15 +32,8 @@ const Login = () => {
 			reset();
 			navigate("/home");
 		} catch (error) {
-			if (axios.isAxiosError(error) && error.response?.status === 401) {
-				setError("password", { message: PASSWORD_NOT_MATCH_ERROR });
-			} else if (axios.isAxiosError(error) && error.response?.status === 404) {
-				setError("email", { message: LOGIN_EMAIL_NOT_FOUND_ERROR });
-			} else if(isPasswordDontMatch(error)){
-				setError("password", { message: PASSWORD_NOT_MATCH_ERROR });
-			} else {
-				setError("email", { message: "Login failed. Please try again." });
-			}
+			const fieldError = mapLoginErrorToField(error);
+			setError(fieldError.field, { message: fieldError.message });
 		}
 	};
 
@@ -132,7 +107,7 @@ const Login = () => {
 								{...register("email", {
 									required: LOGIN_EMAIL_ERROR,
 									pattern: {
-										value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+										value: EMAIL_REGEX,
 										message: LOGIN_EMAIL_ERROR,
 									},
 								})}

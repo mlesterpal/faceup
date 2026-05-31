@@ -1,9 +1,9 @@
-import type { FriendRequestItem } from "@/entities/FriendRequestItem";
-import type { FriendSuggestion } from "@/entities/FriendSuggestion";
-import type { FriendUser } from "@/entities/FriendUser";
-import type { FriendRequest } from "@/components/friends/friends.types";
-import { formatFullName } from "@/utils/formatFullName";
-import { resolveImageUrl } from "@/utils/resolveImageUrl";
+import type { FriendRequestItem } from "../entities/response/FriendRequestItem";
+import type { FriendSuggestion } from "../entities/response/FriendSuggestion";
+import type { FriendUser } from "../entities/response/FriendUser";
+import type { FriendRequest } from "../components/friends/friends.types";
+import { formatFullName } from "./formatFullName";
+import { resolveImageUrl } from "./resolveImageUrl";
 
 type FriendNameFields = {
 	firstName: string;

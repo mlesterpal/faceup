@@ -1,12 +1,10 @@
 import { Flex, Link, SimpleGrid, Text } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
-import FriendRequestCard from "@/components/friends/FriendRequestCard";
-import FriendsListState from "@/components/friends/FriendsListState";
-import FriendsMainContent from "@/components/friends/FriendsMainContent";
-import { useIncomingFriendRequests } from "@/hooks/useFriends";
-import { mapFriendRequestItemToCard } from "@/utils/friendMappers";
-
-const HOME_PREVIEW_LIMIT = 8;
+import FriendRequestCard from "./FriendRequestCard";
+import FriendsListState from "./FriendsListState";
+import FriendsMainContent from "./FriendsMainContent";
+import { useIncomingFriendRequests } from "../../hooks/FriendRepository";
+import { getVisibleFriendRequests, mapIncomingRequestCards, shouldShowFriendRequestPreviewLink } from "./FriendsWorker";
 
 type FriendRequestsViewProps = {
 	preview?: boolean;
@@ -15,7 +13,12 @@ type FriendRequestsViewProps = {
 const FriendRequestsView = ({ preview = false }: FriendRequestsViewProps) => {
 	const { data, isLoading, isError } = useIncomingFriendRequests();
 	const requests = data ?? [];
-	const visible = preview ? requests.slice(0, HOME_PREVIEW_LIMIT) : requests;
+	const visibleRequests = getVisibleFriendRequests(requests, preview);
+	const incomingCards = mapIncomingRequestCards(visibleRequests);
+	const showPreviewLink = shouldShowFriendRequestPreviewLink(
+		requests.length,
+		preview,
+	);
 
 	return (
 		<FriendsMainContent>
@@ -23,7 +26,7 @@ const FriendRequestsView = ({ preview = false }: FriendRequestsViewProps) => {
 				<Text fontSize="xl" fontWeight="bold" color="#080809">
 					Friend Requests
 				</Text>
-				{preview && requests.length > HOME_PREVIEW_LIMIT && (
+				{showPreviewLink && (
 					<Link
 						asChild
 						color="blue.600"
@@ -39,17 +42,17 @@ const FriendRequestsView = ({ preview = false }: FriendRequestsViewProps) => {
 			<FriendsListState
 				isLoading={isLoading}
 				isError={isError}
-				isEmpty={visible.length === 0}
+				isEmpty={visibleRequests.length === 0}
 				emptyMessage="No incoming friend requests."
 			>
 				<SimpleGrid
 					columns={{ base: 2, sm: 3, md: 4, lg: 5, xl: 6, "2xl": 7 }}
 					gap={4}
 				>
-					{visible.map((request) => (
+					{incomingCards.map(({ id, request }) => (
 						<FriendRequestCard
-							key={request.friendshipId}
-							request={mapFriendRequestItemToCard(request)}
+							key={id}
+							request={request}
 						/>
 					))}
 				</SimpleGrid>

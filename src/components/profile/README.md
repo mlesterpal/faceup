@@ -119,7 +119,7 @@ Tab row uses `overflowX="auto"` with hidden scrollbar (`ProfileTabList`, lines 1
 | Add a detail row (work, city, …) | Extend `DEFAULT_DETAILS` in `ProfileHeader.tsx` or pass `details` prop; type `ProfileDetail` in `profile.types.ts` |
 | Style active tab (blue label) | `Tabs.Trigger` `_selected` in `ProfileTabList` (~line 168) |
 | Change “More” dropdown items | `MORE_MENU_ITEMS` in `ProfileHeader.tsx` (~lines 32–38) |
-| Fix posts not showing on **All** tab | `MyPage.tsx` `Tabs.Content value="all"` + `useGetPosts` in `src/hooks/useCreatePost.ts` |
+| Fix posts not showing on **All** tab | `MyPage.tsx` `Tabs.Content value="all"` + `useGetPosts` in `src/hooks/PostRepository.ts` |
 | About / Friends / Photos / Reels empty state | `ProfileTabPlaceholder.tsx` |
 | Hide tab scrollbar | `ProfileTabList` → `Box` `css` block (~lines 151–157) |
 | Change gray gap between tabs and posts | `MyPage.tsx` → `Box mt={4}` below white card (~line 81) |
@@ -173,7 +173,7 @@ Tab content (posts) does **not** use `ProfileHeader` props; it uses `useGetPosts
 | `MyPage.tsx` | Page shell, `Tabs.Root`, white card, post loading |
 | `PostCard.tsx` | Single post card on All tab |
 | `routes.tsx` | Route → `MyPage` |
-| `hooks/useCreatePost.ts` | `useGetPosts` for All tab |
+| `hooks/PostRepository.ts` | `useGetPosts` for All tab |
 
 ---
 

@@ -2,17 +2,14 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import axios from "axios";
-import Login, {
-	LOGIN_EMAIL_ERROR,
-	LOGIN_EMAIL_NOT_FOUND_ERROR,
-	PASSWORD_NOT_MATCH_ERROR,
-} from "./Login";
+import Login from "./Login";
+import { LOGIN_EMAIL_ERROR, LOGIN_EMAIL_NOT_FOUND_ERROR, PASSWORD_NOT_MATCH_ERROR } from "./AuthWorker";
 import { MemoryRouter } from "react-router-dom";
 import { Provider } from "../ui/provider";
-import { useLogin } from "@/hooks/useAuth";
+import { useLogin } from "../../hooks/AuthRepository";
 
 vi.mock("../../assets/login.webp", () => ({ default: "login.webp" }));
-vi.mock("@/hooks/useAuth", () => ({
+vi.mock("../../hooks/AuthRepository", () => ({
 	useLogin: vi.fn(),
 }));
 
@@ -74,30 +71,30 @@ describe("Login", () => {
 		});
 	});
 
-it(`shows "${PASSWORD_NOT_MATCH_ERROR}" when API returns 401`, async () => {
-		const user = userEvent.setup();
-		const unauthorizedError = new axios.AxiosError("Unauthorized");
-		unauthorizedError.response = {
-			status: 401,
-			data: {},
-			statusText: "Unauthorized",
-			headers: {},
-			config: {} as never,
-		};
-		vi.mocked(useLogin).mockReturnValue({
-			isPending: false,
-			mutateAsync: vi.fn().mockRejectedValue(unauthorizedError),
-		} as unknown as ReturnType<typeof useLogin>);
-		renderLogin();
+	it(`shows "${PASSWORD_NOT_MATCH_ERROR}" when API returns 401`, async () => {
+			const user = userEvent.setup();
+			const unauthorizedError = new axios.AxiosError("Unauthorized");
+			unauthorizedError.response = {
+				status: 401,
+				data: {},
+				statusText: "Unauthorized",
+				headers: {},
+				config: {} as never,
+			};
+			vi.mocked(useLogin).mockReturnValue({
+				isPending: false,
+				mutateAsync: vi.fn().mockRejectedValue(unauthorizedError),
+			} as unknown as ReturnType<typeof useLogin>);
+			renderLogin();
 
-		await user.type(screen.getByPlaceholderText("Email"), "mark@example.com");
-		await user.type(screen.getByPlaceholderText("Password"), "wrong-password");
-		await user.click(screen.getByRole("button", { name: "Login" }));
+			await user.type(screen.getByPlaceholderText("Email"), "mark@example.com");
+			await user.type(screen.getByPlaceholderText("Password"), "wrong-password");
+			await user.click(screen.getByRole("button", { name: "Login" }));
 
-		expect(
-		screen.getByText(PASSWORD_NOT_MATCH_ERROR),
-		).toBeInTheDocument();
-	});
+			expect(
+			screen.getByText(PASSWORD_NOT_MATCH_ERROR),
+			).toBeInTheDocument();
+		});
 
 	it(`shows "${LOGIN_EMAIL_NOT_FOUND_ERROR}" when API returns 404`, async () => {
 		const user = userEvent.setup();

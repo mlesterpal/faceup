@@ -1,14 +1,8 @@
-import {
-	Box,
-	Flex,
-	Icon,
-	Image,
-	Text,
-} from "@chakra-ui/react";
+import { Box, Flex, Icon, Image, Text } from "@chakra-ui/react";
 import { FaUserCircle } from "react-icons/fa";
-import type { FriendshipStatus } from "@/entities/FriendshipStatus";
-import type { FriendRequest } from "@/components/friends/friends.types";
-import FriendshipActionButtons from "@/components/friends/FriendshipActionButtons";
+import type { FriendshipStatus } from "./FriendshipStatus";
+import type { FriendRequest } from "./friends.types";
+import FriendshipActionButtons from "./FriendshipActionButtons";
 
 type FriendUserCardProps = {
 	user: FriendRequest;

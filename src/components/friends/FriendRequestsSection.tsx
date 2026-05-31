@@ -1,7 +1,7 @@
 import { Box, Flex, Link, SimpleGrid, Text } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
-import FriendRequestCard from "@/components/friends/FriendRequestCard";
-import type { FriendRequest } from "@/components/friends/friends.types";
+import FriendRequestCard from "./FriendRequestCard";
+import type { FriendRequest } from "./friends.types";
 
 type FriendRequestsSectionProps = {
 	requests: FriendRequest[];

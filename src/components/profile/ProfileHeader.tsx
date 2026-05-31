@@ -1,22 +1,9 @@
 /** @see ./README.md — layout map and change cookbook */
-import {
-	Box,
-	Button,
-	Flex,
-	HStack,
-	Separator,
-	Tabs,
-	Text,
-} from "@chakra-ui/react";
-import ProfileAvatarMenu from "@/components/profile/ProfileAvatarMenu";
+import { Box, Button, Flex, HStack, Separator, Tabs, Text } from "@chakra-ui/react";
+import ProfileAvatarMenu from "./ProfileAvatarMenu";
 import { FaFacebook, FaGraduationCap } from "react-icons/fa";
-import {
-	DEFAULT_PROFILE,
-	PROFILE_TABS,
-	PROFILE_TAB_LABELS,
-	type ProfileDetail,
-	type ProfileHeaderProps,
-} from "@/components/profile/profile.types";
+import { DEFAULT_PROFILE, PROFILE_TABS, PROFILE_TAB_LABELS, type ProfileDetail, type ProfileHeaderProps } from "./profile.types";
+import { getProfileDisplayName } from "./ProfileWorker";
 
 const DEFAULT_DETAILS: ProfileDetail[] = [
 	{ icon: <FaFacebook />, label: "Facebook" },
@@ -36,7 +23,7 @@ const ProfileHeader = ({
 	isUploadingAvatar = false,
 	onProfilePictureError,
 }: ProfileHeaderProps) => {
-	const displayName = name.trim() ? name : "User name can't be found";
+	const displayName = getProfileDisplayName(name);
 
 	return (
 		<Flex

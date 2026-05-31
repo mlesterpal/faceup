@@ -1,5 +1,5 @@
 import { Flex, Text } from "@chakra-ui/react";
-import FriendsMainContent from "@/components/friends/FriendsMainContent";
+import FriendsMainContent from "./FriendsMainContent";
 
 type FriendsViewPlaceholderProps = {
 	message: string;

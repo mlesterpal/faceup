@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
-import type { LoginData } from "@/entities/LoginData";
-import type { User } from "@/entities/User";
-import APIClient from "@/services/apiClient";
+import type { LoginData } from "../entities/post/LoginData";
+import type { User } from "../entities/response/User";
+import APIClient from "../services/apiClient";
 
 const loginClient = new APIClient<User>("/user/login");
 

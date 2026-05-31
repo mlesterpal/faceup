@@ -4,14 +4,10 @@ import userEvent from "@testing-library/user-event";
 import axios from "axios";
 import { Provider } from "../ui/provider";
 import { MemoryRouter } from "react-router-dom";
-import Signup, {
-	BIRTHDAY_FUTURE_ERROR,
-	EMAIL_ALREADY_REGISTERED_ERROR,
-    PASSWORD_NOT_MATCH_ERROR,
-} from "./Signup";
-import { useCreateUser } from "../../hooks/useCreateUser";
+import Signup, {BIRTHDAY_FUTURE_ERROR, EMAIL_ALREADY_REGISTERED_ERROR, PASSWORD_NOT_MATCH_ERROR} from "./Signup";
+import { useCreateUser } from "../../hooks/UserRepository";
 
-vi.mock("../../hooks/useCreateUser", () => ({
+vi.mock("../../hooks/UserRepository", () => ({
 	useCreateUser: vi.fn(),
 }));
 

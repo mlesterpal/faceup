@@ -1,8 +1,8 @@
-import { axiosInstance } from "@/services/apiClient";
-import type { FriendRequestItem } from "@/entities/FriendRequestItem";
-import type { FriendSuggestion } from "@/entities/FriendSuggestion";
-import type { FriendUser } from "@/entities/FriendUser";
-import type { SendFriendRequestPayload } from "@/entities/SendFriendRequestPayload";
+import { axiosInstance } from "./apiClient";
+import type { FriendRequestItem } from "../entities/response/FriendRequestItem";
+import type { FriendSuggestion } from "../entities/response/FriendSuggestion";
+import type { FriendUser } from "../entities/response/FriendUser";
+import type { SendFriendRequestPayload } from "../entities/post/SendFriendRequestPayload";
 
 const base = "/friend";
 

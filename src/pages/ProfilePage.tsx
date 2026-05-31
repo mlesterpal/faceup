@@ -1,36 +1,22 @@
-import Navbar from "@/components/Navbar";
-import PostCard from "@/components/PostCard";
-import ProfileHeader, {
-	ProfileTabList,
-} from "@/components/profile/ProfileHeader";
-import ProfileTabPlaceholder from "@/components/profile/ProfileTabPlaceholder";
-import {
-	PROFILE_TAB_LABELS,
-	type ProfileTab,
-} from "@/components/profile/profile.types";
-import { CURRENT_USER_ID } from "@/constants/currentUser";
-import { useGetPosts } from "@/hooks/useCreatePost";
-import { useGetUser } from "@/hooks/useGetUser";
-import {
-	getProfilePictureErrorMessage,
-	useUpdateProfilePicture,
-} from "@/hooks/useUpdateProfilePicture";
-import { resolveImageUrl } from "@/utils/resolveImageUrl";
+import Navbar from "../components/home/Navbar";
+import PostCard from "../components/home/PostCard";
+import ProfileHeader, { ProfileTabList } from "../components/profile/ProfileHeader";
+import ProfileTabPlaceholder from "../components/profile/ProfileTabPlaceholder";
+import { CURRENT_USER_ID } from "../constants/currentUser";
+import { useGetPosts } from "../hooks/PostRepository";
+import { useGetUser, getProfilePictureErrorMessage, useUpdateProfilePicture } from "../hooks/UserRepository";
+import { resolveImageUrl } from "../utils/resolveImageUrl";
 import { Box, Spinner, Tabs, Text } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
+import { buildProfilePageName, buildProfilePlaceholderTabs, isOwnProfileUser, resolveProfileUserId } from "../components/profile/ProfileWorker";
 
-const PLACEHOLDER_TABS = (
-	["about", "friends", "photos", "reels"] as const satisfies readonly ProfileTab[]
-).map((tab) => ({
-	value: tab,
-	label: PROFILE_TAB_LABELS[tab],
-}));
+const PLACEHOLDER_TABS = buildProfilePlaceholderTabs();
 
 const ProfilePage = () => {
 	const { userId: userIdParam } = useParams();
-	const profileUserId = Number(userIdParam) || CURRENT_USER_ID;
-	const isOwnProfile = profileUserId === CURRENT_USER_ID;
+	const profileUserId = resolveProfileUserId(userIdParam, CURRENT_USER_ID);
+	const isOwnProfile = isOwnProfileUser(profileUserId, CURRENT_USER_ID);
 
 	const { data: userPosts = [], isLoading, isError } = useGetPosts(profileUserId);
 	const { data: user, isLoading: isUserLoading } = useGetUser(profileUserId);
@@ -43,7 +29,7 @@ const ProfilePage = () => {
 	);
 
 	const displayName = user
-		? [user.firstName, user.lastName].filter(Boolean).join(" ")
+		? buildProfilePageName(user.firstName, user.lastName)
 		: undefined;
 
 	const handleProfilePictureSelected = (file: File) => {
