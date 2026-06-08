@@ -11,3 +11,14 @@ if (typeof window.matchMedia !== "function")
 		removeEventListener: () => undefined,
 		dispatchEvent: () => false,
 	});
+
+if (typeof window.ResizeObserver === "undefined") {
+	class ResizeObserverMock implements ResizeObserver {
+		observe(): void {}
+		unobserve(): void {}
+		disconnect(): void {}
+	}
+
+	window.ResizeObserver = ResizeObserverMock;
+	globalThis.ResizeObserver = ResizeObserverMock;
+}

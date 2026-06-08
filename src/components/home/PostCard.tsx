@@ -7,8 +7,10 @@ import type { UserPosts } from "../../entities/response/UserPosts";
 import { formatTimeAgo } from "../../utils/formatTimeAgo";
 import { resolveImageUrl } from "../../utils/resolveImageUrl";
 import { Link } from "react-router-dom";
-import { useTogglePostLike, useTogglePostShare } from "../../hooks/PostRepository";
+import { useTogglePostLike, useTogglePostShare, useDeleteUserPost } from "../../hooks/PostRepository";
 import PostCardElipsis from "./PostCardElipsis";
+import PostCardDeleteModal from "./PostCardDeleteModal";
+import { useState } from "react";
 
 
 export type PostCardProps = {
@@ -25,6 +27,8 @@ const PostCardItem = ({ post }: { post: UserPosts }) => {
 	const profilePicture = resolveImageUrl(post.profilePicture);
 	const { mutate: togglePostLike, isPending } = useTogglePostLike();
 	const { mutate: togglePostShare, isPending: isSharingPending } = useTogglePostShare();
+	const deletePostMutation = useDeleteUserPost();
+	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
 	const hasMessage = Boolean(post.message?.trim());
 	const hasLikes = post.likeCount > 0;
@@ -65,6 +69,14 @@ const PostCardItem = ({ post }: { post: UserPosts }) => {
 		</Flex>
 	);
 
+	const handleDeletePost = () => {
+		deletePostMutation.mutate(post.postId, {
+			onSuccess: () => {
+				setIsDeleteModalOpen(false);
+			},
+		});
+	};
+
 	return (
 
 		<Box bg="white" rounded="2xl" mt="12px">
@@ -94,7 +106,10 @@ const PostCardItem = ({ post }: { post: UserPosts }) => {
 
 					<Flex align="center" columnGap="8px">
 
-						<PostCardElipsis userId={post.userId} />
+						<PostCardElipsis
+							postUserId={post.userId}
+							onDeleteClick={() => setIsDeleteModalOpen(true)}
+						/>
 
 						<Icon boxSize="25px" color="#6F7175" as={IoClose} />
 
@@ -240,6 +255,13 @@ const PostCardItem = ({ post }: { post: UserPosts }) => {
 				</Flex>
 
 			</Box>
+
+			<PostCardDeleteModal
+				open={isDeleteModalOpen}
+				onOpenChange={setIsDeleteModalOpen}
+				onConfirm={handleDeletePost}
+				isDeleting={deletePostMutation.isPending}
+			/>
 
 		</Box>
 

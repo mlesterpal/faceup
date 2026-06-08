@@ -2,6 +2,8 @@ import { axiosInstance } from "./apiClient";
 import type { UserPosts } from "../entities/response/UserPosts";
 import type { TogglePostLikeResponse } from "../entities/response/TogglePostLikeResponse";
 import type { TogglePostShareResponse } from "@/entities/response/TogglePostShareResponse";
+import type { DeleteUserPostResponse } from "../entities/response/DeleteUserPostResponse";
+import type { DeleteUserPostRequest } from "../entities/post/DeleteUserPostRequest";
 
 const base = "/post";
 
@@ -45,6 +47,18 @@ export const togglePostShare = async (
 		`${base}/${postId}/share/toggle`,
 		{ userId } satisfies TogglePostSharePayload,
 	);
+
+	return data;
+};
+
+
+export const deleteUserPost = async (
+	postId: number,
+	userId: number,
+): Promise<DeleteUserPostResponse> => {
+	const { data } = await axiosInstance.delete<DeleteUserPostResponse>(`${base}/${postId}`, {
+		data: { userId } satisfies DeleteUserPostRequest,
+	});
 
 	return data;
 };
