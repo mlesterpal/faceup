@@ -8,4 +8,6 @@ export type UserPosts = {
 	createdAt: string;
 	likeCount: number;
 	isLiked: boolean;
+	shareCount: number;
+	isShared: boolean;
 };

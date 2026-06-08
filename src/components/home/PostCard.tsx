@@ -2,13 +2,13 @@ import { Box, Circle, Flex, Icon, Image, Text, VStack } from "@chakra-ui/react";
 import { HiDotsHorizontal } from "react-icons/hi";
 import { IoClose } from "react-icons/io5";
 import { BiSolidHeartCircle, BiLike, BiSolidLike } from "react-icons/bi";
-import { PiThumbsUpFill, PiShareFat } from "react-icons/pi";
+import { PiThumbsUpFill, PiShareFat, PiShare } from "react-icons/pi";
 import { FaRegComment, FaUserCircle } from "react-icons/fa";
 import type { UserPosts } from "../../entities/response/UserPosts";
 import { formatTimeAgo } from "../../utils/formatTimeAgo";
 import { resolveImageUrl } from "../../utils/resolveImageUrl";
 import { Link } from "react-router-dom";
-import { useTogglePostLike } from "../../hooks/PostRepository";
+import { useTogglePostLike, useTogglePostShare } from "../../hooks/PostRepository";
 
 
 
@@ -25,11 +25,17 @@ const PostCardItem = ({ post }: { post: UserPosts }) => {
 	const imageSrc = resolveImageUrl(post.imageUrl);
 	const profilePicture = resolveImageUrl(post.profilePicture);
 	const { mutate: togglePostLike, isPending } = useTogglePostLike();
+	const { mutate: togglePostShare, isPending: isSharingPending } = useTogglePostShare();
 
 	const hasMessage = Boolean(post.message?.trim());
 	const hasLikes = post.likeCount > 0;
 	const likeColor = post.isLiked ? "#1E7BFE" : "#6F7175";
 	const likeLabel = post.isLiked ? "Liked" : "Like";
+
+	const hasShares = post.shareCount > 0;
+	const shareColor = post.isShared ? "#1E7BFE" : "#6F7175";
+	const shareLabel = post.isShared ? "Shared" : "Share";
+
 	const canLinkToProfile =
 		typeof post.userId === "number" && Number.isFinite(post.userId);
 
@@ -159,7 +165,14 @@ const PostCardItem = ({ post }: { post: UserPosts }) => {
 
 						<Text color="#6F7175">0 comments</Text>
 
-						<Text color="#6F7175">0 shares</Text>
+						{hasShares && (
+							<>
+								<Icon as={PiShareFat} color="#1E7BFE" boxSize="22px" mr={-4} />
+								<Text color="#6F7175" fontSize="14px" fontWeight="400" ml={1}>
+									{post.shareCount}
+								</Text>
+							</>
+						)}
 
 					</Flex>
 
@@ -213,11 +226,15 @@ const PostCardItem = ({ post }: { post: UserPosts }) => {
 
 					</Flex>
 
-					<Flex align="center" fontSize="16px" columnGap={1.5}>
+					<Flex align="center" fontSize="16px" columnGap={1.5} cursor={isSharingPending ? "not-allowed" : "pointer"} onClick={() => {
+						if (!isSharingPending) {
+							togglePostShare(post.postId);
+						}
+					}} role="button" aria-pressed={post.isShared} opacity={isSharingPending ? 0.7 : 1} color={shareColor}>
 
-						<Icon as={PiShareFat} boxSize="22px" />
+						<Icon as={post.isShared ? PiShareFat : PiShare} color={shareColor} boxSize="22px"/>
 
-						<Text>Share</Text>
+						<Text>{shareLabel}</Text>
 
 					</Flex>
 

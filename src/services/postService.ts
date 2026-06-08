@@ -1,6 +1,7 @@
 import { axiosInstance } from "./apiClient";
 import type { UserPosts } from "../entities/response/UserPosts";
 import type { TogglePostLikeResponse } from "../entities/response/TogglePostLikeResponse";
+import type { TogglePostShareResponse } from "@/entities/response/TogglePostShareResponse";
 
 const base = "/post";
 
@@ -29,6 +30,20 @@ export const togglePostLike = async (
 	const { data } = await axiosInstance.post<TogglePostLikeResponse>(
 		`${base}/${postId}/like/toggle`,
 		{ userId } satisfies TogglePostLikePayload,
+	);
+
+	return data;
+};
+
+type TogglePostSharePayload = { userId: number };
+
+export const togglePostShare = async (
+	postId: number,
+	userId: number,
+): Promise<TogglePostShareResponse> => {
+	const { data } = await axiosInstance.post<TogglePostShareResponse>(
+		`${base}/${postId}/share/toggle`,
+		{ userId } satisfies TogglePostSharePayload,
 	);
 
 	return data;
