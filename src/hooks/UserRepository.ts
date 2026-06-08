@@ -30,7 +30,7 @@ export const useGetUser = (userId: number = CURRENT_USER_ID) =>
 		queryKey: ["user", userId],
 		queryFn: () => getUser(userId),
 	});
-
+ 
 export const getProfilePictureErrorMessage = (error: unknown): string => {
 	if (axios.isAxiosError(error)) {
 		const message = error.response?.data?.message;

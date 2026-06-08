@@ -2,9 +2,11 @@ import APIClient from "../services/apiClient";
 import type { CreatePostPayload } from "../entities/post/CreatePost";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { UserPosts } from "../entities/response/UserPosts";
+import { CURRENT_USER_ID } from "../constants/currentUser";
+import { getPosts, togglePostLike } from "../services/postService";
+import type { TogglePostLikeResponse } from "../entities/response/TogglePostLikeResponse";
 
 const createPost = new APIClient<UserPosts>("/post");
-const getMyPost = new APIClient<UserPosts>("/post");
 
 const buildPostFormData = ({ message, image }: CreatePostPayload): FormData => {
 	const formData = new FormData();
@@ -30,11 +32,23 @@ export const useCreatePost = () => {
 export const useGetPosts = (userId: number | null) => {
 	return useQuery<UserPosts[]>({
 		queryKey: ["posts", userId ?? "all"],
-		queryFn: () =>
-			getMyPost
-				.getAll({
-					params: userId != null ? { userId } : {},
-				})
-				.then((res) => res.results),
+		queryFn: () => getPosts(userId, CURRENT_USER_ID),
+	});
+};
+
+export const useTogglePostLike = (userId: number = CURRENT_USER_ID) => {
+	const queryClient = useQueryClient();
+
+	return useMutation<TogglePostLikeResponse, Error, number>({
+		mutationFn: (postId) => togglePostLike(postId, userId),
+		onSuccess: (data) => {
+			queryClient.setQueriesData<UserPosts[]>({ queryKey: ["posts"] }, (posts) =>
+				posts?.map((post) =>
+					post.postId === data.postId
+						? { ...post, likeCount: data.likeCount, isLiked: data.liked }
+						: post,
+				),
+			);
+		},
 	});
 };
