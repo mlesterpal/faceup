@@ -19,7 +19,7 @@ export type PostCardProps = {
 };
 
 
-
+   
 const PostCardItem = ({ post }: { post: UserPosts }) => {
 
 	const imageSrc = resolveImageUrl(post.imageUrl);
@@ -253,7 +253,6 @@ const PostCardItem = ({ post }: { post: UserPosts }) => {
 const PostCard = ({ userPosts }: PostCardProps) => {
 
 	return (
-
 		<>
 
 			{userPosts.map((post) => (
