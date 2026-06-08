@@ -24,14 +24,14 @@ export const isPasswordNotMatchError = (error: unknown): boolean => {
 };
 
 export const mapLoginErrorToField = (error: unknown): LoginFieldError => {
-	if (axios.isAxiosError(error) && error.response?.status === 401) {
-		return { field: "password", message: PASSWORD_NOT_MATCH_ERROR };
+	if (axios.isAxiosError(error) && error.response?.status === 401 && error.response?.data.message.toLowerCase().includes("invalid password")) {
+		return { field: "password", message: "so dito nga" };
 	}
 	if (axios.isAxiosError(error) && error.response?.status === 404) {
 		return { field: "email", message: LOGIN_EMAIL_NOT_FOUND_ERROR };
 	}
 	if (isPasswordNotMatchError(error)) {
-		return { field: "password", message: PASSWORD_NOT_MATCH_ERROR };
+		return { field: "password", message: "galing monga pala" };
 	}
 	return { field: "email", message: LOGIN_GENERIC_ERROR };
 };

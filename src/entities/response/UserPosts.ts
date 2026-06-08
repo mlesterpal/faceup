@@ -6,4 +6,6 @@ export type UserPosts = {
 	imageUrl?: string | null;
 	profilePicture?: string | null;
 	createdAt: string;
+	likeCount: number;
+	isLiked: boolean;
 };

@@ -1,13 +1,14 @@
 import { Box, Circle, Flex, Icon, Image, Text, VStack } from "@chakra-ui/react";
 import { HiDotsHorizontal } from "react-icons/hi";
 import { IoClose } from "react-icons/io5";
-import { BiSolidHeartCircle, BiLike } from "react-icons/bi";
+import { BiSolidHeartCircle, BiLike, BiSolidLike } from "react-icons/bi";
 import { PiThumbsUpFill, PiShareFat } from "react-icons/pi";
 import { FaRegComment, FaUserCircle } from "react-icons/fa";
 import type { UserPosts } from "../../entities/response/UserPosts";
 import { formatTimeAgo } from "../../utils/formatTimeAgo";
 import { resolveImageUrl } from "../../utils/resolveImageUrl";
 import { Link } from "react-router-dom";
+import { useTogglePostLike } from "../../hooks/PostRepository";
 
 
 
@@ -23,8 +24,12 @@ const PostCardItem = ({ post }: { post: UserPosts }) => {
 
 	const imageSrc = resolveImageUrl(post.imageUrl);
 	const profilePicture = resolveImageUrl(post.profilePicture);
+	const { mutate: togglePostLike, isPending } = useTogglePostLike();
 
 	const hasMessage = Boolean(post.message?.trim());
+	const hasLikes = post.likeCount > 0;
+	const likeColor = post.isLiked ? "#1E7BFE" : "#6F7175";
+	const likeLabel = post.isLiked ? "Liked" : "Like";
 	const canLinkToProfile =
 		typeof post.userId === "number" && Number.isFinite(post.userId);
 
@@ -134,17 +139,19 @@ const PostCardItem = ({ post }: { post: UserPosts }) => {
 
 				<Flex justify="space-between" px={4} mt={2}>
 
-					<Flex align="center">
+					<Flex align="center" minH="22px">
 
-						<Icon as={BiSolidHeartCircle} color="#FD4A50" boxSize="22px" />
+						{hasLikes && (
+							<>
+								<Icon as={BiSolidHeartCircle} color="#FD4A50" boxSize="22px" />
 
-						<Icon as={PiThumbsUpFill} color="#1E7BFE" boxSize="22px" />
+								<Icon as={PiThumbsUpFill} color="#1E7BFE" boxSize="22px" />
 
-						<Text color="#6F7175" fontSize="14px" fontWeight="400" ml={1}>
-
-							0
-
-						</Text>
+								<Text color="#6F7175" fontSize="14px" fontWeight="400" ml={1}>
+									{post.likeCount}
+								</Text>
+							</>
+						)}
 
 					</Flex>
 
@@ -176,11 +183,25 @@ const PostCardItem = ({ post }: { post: UserPosts }) => {
 
 				>
 
-					<Flex align="center" fontSize="16px" columnGap={1.5}>
+					<Flex
+						align="center"
+						fontSize="16px"
+						columnGap={1.5}
+						cursor={isPending ? "not-allowed" : "pointer"}
+						onClick={() => {
+							if (!isPending) {
+								togglePostLike(post.postId);
+							}
+						}}
+						role="button"
+						aria-pressed={post.isLiked}
+						opacity={isPending ? 0.7 : 1}
+						color={likeColor}
+					>
 
-						<Icon as={BiLike} boxSize="22px" />
+						<Icon as={post.isLiked ? BiSolidLike : BiLike} boxSize="22px" />
 
-						<Text>Like</Text>
+						<Text>{likeLabel}</Text>
 
 					</Flex>
 
