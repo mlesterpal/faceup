@@ -3,8 +3,9 @@ import type { CreatePostPayload } from "../entities/post/CreatePost";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { UserPosts } from "../entities/response/UserPosts";
 import { CURRENT_USER_ID } from "../constants/currentUser";
-import { getPosts, togglePostLike } from "../services/postService";
+import { getPosts, togglePostLike, togglePostShare } from "../services/postService";
 import type { TogglePostLikeResponse } from "../entities/response/TogglePostLikeResponse";
+import type { TogglePostShareResponse } from "@/entities/response/TogglePostShareResponse";
 
 const createPost = new APIClient<UserPosts>("/post");
 
@@ -49,6 +50,23 @@ export const useTogglePostLike = (userId: number = CURRENT_USER_ID) => {
 						: post,
 				),
 			);
+		},
+	});
+};
+
+export const useTogglePostShare = (userId: number = CURRENT_USER_ID) => {
+	const queryClient = useQueryClient();
+
+	return useMutation<TogglePostShareResponse, Error, number>({
+		mutationFn: (postId) => togglePostShare(postId, userId),
+		onSuccess: (data) => {
+			queryClient.setQueriesData<UserPosts[]>({ queryKey: ["posts"] }, (posts) =>
+				posts?.map((post) =>
+					post.postId === data.postId
+						? { ...post, shareCount: data.shareCount, isShared: data.isShared }
+						: post,
+				),
+			);	
 		},
 	});
 };
