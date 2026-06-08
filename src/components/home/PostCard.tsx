@@ -1,5 +1,4 @@
 import { Box, Circle, Flex, Icon, Image, Text, VStack } from "@chakra-ui/react";
-import { HiDotsHorizontal } from "react-icons/hi";
 import { IoClose } from "react-icons/io5";
 import { BiSolidHeartCircle, BiLike, BiSolidLike } from "react-icons/bi";
 import { PiThumbsUpFill, PiShareFat, PiShare } from "react-icons/pi";
@@ -9,7 +8,7 @@ import { formatTimeAgo } from "../../utils/formatTimeAgo";
 import { resolveImageUrl } from "../../utils/resolveImageUrl";
 import { Link } from "react-router-dom";
 import { useTogglePostLike, useTogglePostShare } from "../../hooks/PostRepository";
-
+import PostCardElipsis from "./PostCardElipsis";
 
 
 export type PostCardProps = {
@@ -95,7 +94,7 @@ const PostCardItem = ({ post }: { post: UserPosts }) => {
 
 					<Flex align="center" columnGap="8px">
 
-						<Icon boxSize="25px" color="#6F7175" as={HiDotsHorizontal} />
+						<PostCardElipsis userId={post.userId} />
 
 						<Icon boxSize="25px" color="#6F7175" as={IoClose} />
 
