@@ -6,6 +6,8 @@ import { CURRENT_USER_ID } from "../constants/currentUser";
 import { getPosts, togglePostLike, togglePostShare } from "../services/postService";
 import type { TogglePostLikeResponse } from "../entities/response/TogglePostLikeResponse";
 import type { TogglePostShareResponse } from "@/entities/response/TogglePostShareResponse";
+import { deleteUserPost } from "../services/postService";
+import type { DeleteUserPostResponse } from "../entities/response/DeleteUserPostResponse";
 
 const createPost = new APIClient<UserPosts>("/post");
 
@@ -67,6 +69,17 @@ export const useTogglePostShare = (userId: number = CURRENT_USER_ID) => {
 						: post,
 				),
 			);	
+		},
+	});
+};
+
+export const useDeleteUserPost = (userId: number = CURRENT_USER_ID) => {
+	const queryClient = useQueryClient();
+
+	return useMutation<DeleteUserPostResponse, Error, number>({
+		mutationFn: (postId: number) => deleteUserPost(postId, userId),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["posts"] });
 		},
 	});
 };
