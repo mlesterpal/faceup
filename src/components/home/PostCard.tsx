@@ -79,7 +79,7 @@ const PostCardItem = ({ post }: { post: UserPosts }) => {
 
 	return (
 
-		<Box bg="white" rounded="2xl" mt="12px">
+		<Box bg="white" rounded="2xl" mt="12px" className="post-card">
 
 			<Box padding="12px">
 
