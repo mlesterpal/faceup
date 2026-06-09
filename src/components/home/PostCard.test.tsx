@@ -1,16 +1,21 @@
 import { useEffect, useState } from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Provider } from "../ui/provider";
 import PostCard from "./PostCard";
 import type { UserPosts } from "../../entities/response/UserPosts";
-import { useTogglePostLike, useTogglePostShare } from "../../hooks/PostRepository";
+import {
+	useDeleteUserPost,
+	useTogglePostLike,
+	useTogglePostShare,
+} from "../../hooks/PostRepository";
 
 vi.mock("../../hooks/PostRepository", () => ({
 	useTogglePostLike: vi.fn(),
 	useTogglePostShare: vi.fn(),
+	useDeleteUserPost: vi.fn(),
 }));
 
 vi.mock("../../utils/formatTimeAgo", () => ({
@@ -79,6 +84,8 @@ type PostCardShareHarnessProps = {
 };
 let applyShare: ((postId: number) => void) | undefined;
 let shareMutateSpy: ReturnType<typeof vi.fn>;
+let applyDelete: ((postId: number) => void) | undefined;
+let deleteMutateSpy: ReturnType<typeof vi.fn>;
 
 const PostCardShareHarness = ({ initialPosts }: PostCardShareHarnessProps) => {
 	const [posts, setPosts] = useState(initialPosts);
@@ -102,6 +109,28 @@ const PostCardShareHarness = ({ initialPosts }: PostCardShareHarnessProps) => {
 	return <PostCard userPosts={posts} />;
 };
 
+type PostCardDeleteHarnessProps = {
+	initialPosts: UserPosts[];
+};
+
+const PostCardDeleteHarness = ({ initialPosts }: PostCardDeleteHarnessProps) => {
+	const [posts, setPosts] = useState(initialPosts);
+
+	useEffect(() => {
+		applyDelete = (postId: number) => {
+			setPosts((currentPosts) =>
+				currentPosts.filter((post) => post.postId !== postId),
+			);
+		};
+
+		return () => {
+			applyDelete = undefined;
+		};
+	}, []);
+
+	return <PostCard userPosts={posts} />;
+};
+
 describe("PostCard", () => {
 	beforeEach(() => {
 		likeMutateSpy = vi.fn((postId: number) => {
@@ -111,6 +140,17 @@ describe("PostCard", () => {
 		shareMutateSpy = vi.fn((postId: number) => {
 			applyShare?.(postId);
 		});
+		deleteMutateSpy = vi.fn(
+			(
+				postId: number,
+				options?: {
+					onSuccess?: () => void;
+				},
+			) => {
+				applyDelete?.(postId);
+				options?.onSuccess?.();
+			},
+		);
 
 		vi.mocked(useTogglePostLike).mockReturnValue({
 			mutate: likeMutateSpy,
@@ -121,12 +161,18 @@ describe("PostCard", () => {
 			mutate: shareMutateSpy,
 			isPending: false,
 		} as unknown as ReturnType<typeof useTogglePostShare>);
+
+		vi.mocked(useDeleteUserPost).mockReturnValue({
+			mutate: deleteMutateSpy,
+			isPending: false,
+		} as unknown as ReturnType<typeof useDeleteUserPost>);
 	});
 
 	afterEach(() => {
 		vi.clearAllMocks();
 		applyLike = undefined;
 		applyShare = undefined;
+		applyDelete = undefined;
 	});
 
 	it("shows Shared when user clicks Share", async () => {
@@ -169,5 +215,34 @@ describe("PostCard", () => {
 		renderPostCard([createMockPost({ isLiked: false })]);
 
 		expect(screen.getByRole("button", { name: "Like" })).toBeInTheDocument();
+	});
+
+	it("decreases post cards by 1 after successful delete", async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Provider>
+				<MemoryRouter>
+					<PostCardDeleteHarness
+						initialPosts={[
+							createMockPost({ postId: 1, userId: 1, message: "Post A" }),
+							createMockPost({ postId: 2, userId: 1, message: "Post B" }),
+						]}
+					/>
+				</MemoryRouter>
+			</Provider>,
+		);
+
+		expect(screen.getAllByRole("button", { name: "Like" })).toHaveLength(2);
+
+		const ellipsisButtons = document.querySelectorAll(".post-card-elipsis");
+		await user.click(ellipsisButtons[0] as HTMLElement);
+		await user.click(await screen.findByText("Move to trash"));
+		await user.click(screen.getByRole("button", { name: "Delete post" }));
+
+		await waitFor(() => {
+			expect(document.querySelectorAll(".post-card")).toHaveLength(1);
+		});
+		expect(deleteMutateSpy).toHaveBeenCalledWith(1, expect.any(Object));
 	});
 });
