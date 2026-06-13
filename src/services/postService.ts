@@ -4,6 +4,7 @@ import type { TogglePostLikeResponse } from "../entities/response/TogglePostLike
 import type { TogglePostShareResponse } from "@/entities/response/TogglePostShareResponse";
 import type { DeleteUserPostResponse } from "../entities/response/DeleteUserPostResponse";
 import type { DeleteUserPostRequest } from "../entities/post/DeleteUserPostRequest";
+import type { PostLikeUser } from "../entities/response/PostLikeUser";
 
 const base = "/post";
 
@@ -21,6 +22,14 @@ export const getPosts = async (
 			...(viewerUserId != null ? { viewerUserId } : {}),
 		},
 	});
+
+	return data.results ?? [];
+};
+
+export const getPostLikes = async (postId: number): Promise<PostLikeUser[]> => {
+	const { data } = await axiosInstance.get<PostResults<PostLikeUser>>(
+		`${base}/${postId}/likes`,
+	);
 
 	return data.results ?? [];
 };
