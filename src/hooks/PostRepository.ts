@@ -3,11 +3,17 @@ import type { CreatePostPayload } from "../entities/post/CreatePost";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { UserPosts } from "../entities/response/UserPosts";
 import { CURRENT_USER_ID } from "../constants/currentUser";
-import { getPosts, togglePostLike, togglePostShare } from "../services/postService";
+import {
+	getPostLikes,
+	getPosts,
+	togglePostLike,
+	togglePostShare,
+} from "../services/postService";
 import type { TogglePostLikeResponse } from "../entities/response/TogglePostLikeResponse";
 import type { TogglePostShareResponse } from "@/entities/response/TogglePostShareResponse";
 import { deleteUserPost } from "../services/postService";
 import type { DeleteUserPostResponse } from "../entities/response/DeleteUserPostResponse";
+import type { PostLikeUser } from "../entities/response/PostLikeUser";
 
 const createPost = new APIClient<UserPosts>("/post");
 
@@ -36,6 +42,17 @@ export const useGetPosts = (userId: number | null) => {
 	return useQuery<UserPosts[]>({
 		queryKey: ["posts", userId ?? "all"],
 		queryFn: () => getPosts(userId, CURRENT_USER_ID),
+	});
+};
+
+export const useGetPostLikes = (
+	postId: number | null,
+	enabled: boolean = true,
+) => {
+	return useQuery<PostLikeUser[]>({
+		queryKey: ["post-likes", postId],
+		queryFn: () => getPostLikes(postId!),
+		enabled: enabled && postId != null,
 	});
 };
 
