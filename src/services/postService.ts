@@ -5,6 +5,8 @@ import type { TogglePostShareResponse } from "@/entities/response/TogglePostShar
 import type { DeleteUserPostResponse } from "../entities/response/DeleteUserPostResponse";
 import type { DeleteUserPostRequest } from "../entities/post/DeleteUserPostRequest";
 import type { PostLikeUser } from "../entities/response/PostLikeUser";
+import type { CreatePostCommentRequest } from "../entities/post/CreatePostCommentRequest";
+import type { CreatePostCommentResponse } from "../entities/response/CreatePostCommentResponse";
 
 const base = "/post";
 
@@ -32,6 +34,18 @@ export const getPostLikes = async (postId: number): Promise<PostLikeUser[]> => {
 	);
 
 	return data.results ?? [];
+};
+
+export const createPostComment = async (
+	postId: number,
+	payload: CreatePostCommentRequest,
+): Promise<CreatePostCommentResponse> => {
+	const { data } = await axiosInstance.post<CreatePostCommentResponse>(
+		`${base}/${postId}/comments`,
+		payload,
+	);
+
+	return data;
 };
 
 export const togglePostLike = async (

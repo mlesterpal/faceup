@@ -1,8 +1,8 @@
 import { Box, Circle, Flex, Icon, Image, Text, VStack } from "@chakra-ui/react";
 import { IoClose } from "react-icons/io5";
-import { BiSolidHeartCircle, BiLike, BiSolidLike } from "react-icons/bi";
-import { PiThumbsUpFill, PiShareFat, PiShare } from "react-icons/pi";
-import { FaRegComment, FaUserCircle } from "react-icons/fa";
+import { BiLike, BiSolidLike } from "react-icons/bi";
+import { PiShareFat, PiShare } from "react-icons/pi";
+import { FaUserCircle } from "react-icons/fa";
 import type { UserPosts } from "../../entities/response/UserPosts";
 import { formatTimeAgo } from "../../utils/formatTimeAgo";
 import { resolveImageUrl } from "../../utils/resolveImageUrl";
@@ -16,6 +16,7 @@ import PostCardElipsis from "./PostCardElipsis";
 import PostCardDeleteModal from "./PostCardDeleteModal";
 import { useState } from "react";
 import PostLikes from "./PostLikes";
+import PostCommentModal from "./PostCommentModal";
 
 export type PostCardProps = {
     userPosts: UserPosts[];
@@ -210,9 +211,14 @@ const PostCardItem = ({ post }: { post: UserPosts }) => {
                     </Flex>
 
                     <Flex align="center" fontSize="16px" columnGap={1.5}>
-                        <Icon as={FaRegComment} boxSize="22px" />
-
-                        <Text>Comment</Text>
+                        <PostCommentModal
+                            postId={post.postId}
+                            profilePicture={profilePicture}
+                            firstName={post.firstName}
+                            createdAt={post.createdAt}
+                            message={post.message}
+                            imageSrc={imageSrc}
+                        />
                     </Flex>
 
                     <Flex
