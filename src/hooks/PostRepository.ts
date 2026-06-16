@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { UserPosts } from "../entities/response/UserPosts";
 import { CURRENT_USER_ID } from "../constants/currentUser";
 import {
+	createPostComment,
 	getPostLikes,
 	getPosts,
 	togglePostLike,
@@ -14,6 +15,7 @@ import type { TogglePostShareResponse } from "@/entities/response/TogglePostShar
 import { deleteUserPost } from "../services/postService";
 import type { DeleteUserPostResponse } from "../entities/response/DeleteUserPostResponse";
 import type { PostLikeUser } from "../entities/response/PostLikeUser";
+import type { CreatePostCommentResponse } from "../entities/response/CreatePostCommentResponse";
 
 const createPost = new APIClient<UserPosts>("/post");
 
@@ -97,6 +99,25 @@ export const useDeleteUserPost = (userId: number = CURRENT_USER_ID) => {
 		mutationFn: (postId: number) => deleteUserPost(postId, userId),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["posts"] });
+		},
+	});
+};
+
+type CreatePostCommentVariables = {
+	postId: number;
+	comment: string;
+};
+
+export const useCreatePostComment = (userId: number = CURRENT_USER_ID) => {
+	const queryClient = useQueryClient();
+
+	return useMutation<CreatePostCommentResponse, Error, CreatePostCommentVariables>({
+		mutationFn: ({ postId, comment }) =>
+			createPostComment(postId, { userId, comment }),
+		onSuccess: (_, variables) => {
+			queryClient.invalidateQueries({
+				queryKey: ["post-comments", variables.postId],
+			});
 		},
 	});
 };
