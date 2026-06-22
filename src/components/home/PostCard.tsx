@@ -2,7 +2,7 @@ import { Box, Circle, Flex, Icon, Image, Text, VStack } from "@chakra-ui/react";
 import { IoClose } from "react-icons/io5";
 import { BiLike, BiSolidLike } from "react-icons/bi";
 import { PiShareFat, PiShare } from "react-icons/pi";
-import { FaUserCircle } from "react-icons/fa";
+import { FaRegComment, FaUserCircle } from "react-icons/fa";
 import type { UserPosts } from "../../entities/response/UserPosts";
 import { formatTimeAgo } from "../../utils/formatTimeAgo";
 import { resolveImageUrl } from "../../utils/resolveImageUrl";
@@ -30,6 +30,7 @@ const PostCardItem = ({ post }: { post: UserPosts }) => {
         useTogglePostShare();
     const deletePostMutation = useDeleteUserPost();
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
 
     const hasMessage = Boolean(post.message?.trim());
     const hasLikes = post.likeCount > 0;
@@ -210,15 +211,16 @@ const PostCardItem = ({ post }: { post: UserPosts }) => {
                         <Text>{likeLabel}</Text>
                     </Flex>
 
-                    <Flex align="center" fontSize="16px" columnGap={1.5}>
-                        <PostCommentModal
-                            postId={post.postId}
-                            profilePicture={profilePicture}
-                            firstName={post.firstName}
-                            createdAt={post.createdAt}
-                            message={post.message}
-                            imageSrc={imageSrc}
-                        />
+                    <Flex
+                        align="center"
+                        fontSize="16px"
+                        columnGap={1.5}
+                        cursor="pointer"
+                        onClick={() => setIsCommentModalOpen(true)}
+                        role="button"
+                    >
+                        <Icon as={FaRegComment} boxSize="22px" />
+                        <Text>Comment</Text>
                     </Flex>
 
                     <Flex
@@ -253,6 +255,19 @@ const PostCardItem = ({ post }: { post: UserPosts }) => {
                 onConfirm={handleDeletePost}
                 isDeleting={deletePostMutation.isPending}
             />
+
+            {isCommentModalOpen && (
+                <PostCommentModal
+                    open={isCommentModalOpen}
+                    onOpenChange={setIsCommentModalOpen}
+                    postId={post.postId}
+                    profilePicture={profilePicture}
+                    firstName={post.firstName}
+                    createdAt={post.createdAt}
+                    message={post.message}
+                    imageSrc={imageSrc}
+                />
+            )}
         </Box>
     );
 };

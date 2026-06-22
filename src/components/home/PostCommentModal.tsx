@@ -1,6 +1,5 @@
 import {
     Box,
-    Button,
     Circle,
     Dialog,
     Flex,
@@ -13,7 +12,7 @@ import {
     Input,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { FaRegComment, FaUserCircle } from "react-icons/fa";
+import { FaUserCircle } from "react-icons/fa";
 import { IoClose, IoSend } from "react-icons/io5";
 import { formatTimeAgo } from "../../utils/formatTimeAgo";
 import { resolveImageUrl } from "../../utils/resolveImageUrl";
@@ -46,6 +45,8 @@ const authorHeader = (
 );
 
 type PostCommentModalProps = {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
     postId: number;
     profilePicture: string;
     firstName: string;
@@ -55,6 +56,8 @@ type PostCommentModalProps = {
 };
 
 const PostCommentModal = ({
+    open,
+    onOpenChange,
     postId,
     profilePicture,
     firstName,
@@ -68,7 +71,7 @@ const PostCommentModal = ({
         data: comments = [],
         isLoading: isCommentsLoading,
         isError: isCommentsError,
-    } = useGetPostComments(postId);
+    } = useGetPostComments(postId, open);
 
     const hasMessage = Boolean(message?.trim());
     const resolvedPostImage = resolveImageUrl(imageSrc);
@@ -89,17 +92,11 @@ const PostCommentModal = ({
 
     return (
         <Box>
-            <Dialog.Root placement="center">
-                <Dialog.Trigger asChild>
-                    <Button
-                        size="sm"
-                        variant="plain"
-                        _hover={{ outline: "none" }}
-                    >
-                        <Icon as={FaRegComment} boxSize="22px" />
-                        <Text>Comment</Text>
-                    </Button>
-                </Dialog.Trigger>
+            <Dialog.Root
+                placement="center"
+                open={open}
+                onOpenChange={(details) => onOpenChange(details.open)}
+            >
                 <Portal>
                     <Dialog.Backdrop />
                     <Dialog.Positioner>
