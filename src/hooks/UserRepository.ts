@@ -2,14 +2,19 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { CURRENT_USER_ID } from "../constants/currentUser";
 import type { CreateUser, CreateUserPayload } from "../entities/post/CreateUser";
+import type { UpdateUserProfilePayload } from "../entities/response/UpdateUserProfilePayload";
 import type { UpdateProfilePictureResponse } from "../entities/response/UpdateProfilePictureResponse";
 import type { User } from "../entities/response/User";
 import APIClient, { type FetchResponse } from "../services/apiClient";
-import { getUser, uploadProfilePicture } from "../services/userService";
+import { getUser, updateUserProfile, uploadProfilePicture } from "../services/userService";
 import { formatBirthDateIso } from "../utils/formatBirthDateIso";
 
 const createUserClient = new APIClient<CreateUserPayload>("/user");
 const usersClient = new APIClient<User>("/user");
+
+type UpdateUserProfileVariables =
+	| { payload: UpdateUserProfilePayload }
+	| { field: keyof UpdateUserProfilePayload; value: string | null };
 
 function toCreateUserPayload(data: CreateUser): CreateUserPayload {
 	const { birthMonth, birthDay, birthYear, ...rest } = data;
@@ -47,6 +52,37 @@ export const useUpdateProfilePicture = (userId: number = CURRENT_USER_ID) => {
 		mutationFn: (file) => uploadProfilePicture(userId, file),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["user", userId] });
+		},
+	});
+};
+
+const toUpdateUserProfilePayload = (
+	variables: UpdateUserProfileVariables,
+): UpdateUserProfilePayload => {
+	if ("payload" in variables) {
+		return variables.payload;
+	}
+
+	return { [variables.field]: variables.value };
+};
+
+export const useUpdateUserProfile = (userId: number = CURRENT_USER_ID) => {
+	const queryClient = useQueryClient();
+
+	return useMutation<User, Error, UpdateUserProfileVariables>({
+		mutationFn: (variables) =>
+			updateUserProfile(userId, toUpdateUserProfilePayload(variables)),
+		onSuccess: (updatedUser) => {
+			queryClient.setQueryData<User | undefined>(["user", userId], (currentUser) => {
+				if (!currentUser) {
+					return updatedUser;
+				}
+
+				return {
+					...currentUser,
+					...updatedUser,
+				};
+			});
 		},
 	});
 };

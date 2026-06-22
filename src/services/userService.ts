@@ -1,4 +1,5 @@
 import { axiosInstance } from "./apiClient";
+import type { UpdateUserProfilePayload } from "../entities/response/UpdateUserProfilePayload";
 import type { User } from "../entities/response/User";
 
 export const getUser = (userId: number): Promise<User> =>
@@ -16,5 +17,14 @@ export const uploadProfilePicture = (userId: number, file: File) => {
 				headers: { "Content-Type": "multipart/form-data" },
 			},
 		)
+		.then((res) => res.data);
+};
+
+export const updateUserProfile = (
+	userId: number,
+	payload: UpdateUserProfilePayload,
+): Promise<User> => {
+	return axiosInstance
+		.put<User>(`/user/${userId}/profile`, payload)
 		.then((res) => res.data);
 };
