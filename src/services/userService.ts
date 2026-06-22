@@ -1,7 +1,7 @@
 import { axiosInstance } from "./apiClient";
 import type { User } from "../entities/response/User";
 
-export const getUser = (userId: number) =>
+export const getUser = (userId: number): Promise<User> =>
 	axiosInstance.get<User>(`/user/${userId}`).then((res) => res.data);
 
 export const uploadProfilePicture = (userId: number, file: File) => {
