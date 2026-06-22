@@ -142,9 +142,13 @@ export const useCreatePostComment = (userId: number = CURRENT_USER_ID) => {
     });
 };
 
-export const useGetPostComments = (postId: number) => {
+export const useGetPostComments = (
+    postId: number,
+    enabled: boolean = true,
+) => {
     return useQuery<PostComments[]>({
         queryKey: ["post-comments", postId],
         queryFn: () => getPostComments(postId),
+        enabled,
     });
 };
