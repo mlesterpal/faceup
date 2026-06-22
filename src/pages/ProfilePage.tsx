@@ -1,12 +1,14 @@
 import Navbar from "../components/home/Navbar";
 import PostCard from "../components/home/PostCard";
+import ProfileAbout from "../components/profile/ProfileAbout";
 import ProfileHeader, { ProfileTabList } from "../components/profile/ProfileHeader";
 import ProfileTabPlaceholder from "../components/profile/ProfileTabPlaceholder";
+import UserProfileAbout from "../components/profile/UserProfileAbout";
 import { CURRENT_USER_ID } from "../constants/currentUser";
 import { useGetPosts } from "../hooks/PostRepository";
 import { useGetUser, getProfilePictureErrorMessage, useUpdateProfilePicture } from "../hooks/UserRepository";
 import { resolveImageUrl } from "../utils/resolveImageUrl";
-import { Box, Spinner, Tabs, Text } from "@chakra-ui/react";
+import { Box, Grid, GridItem, Spinner, Tabs, Text } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { buildProfilePageName, buildProfilePlaceholderTabs, isOwnProfileUser, resolveProfileUserId } from "../components/profile/ProfileWorker";
@@ -81,18 +83,57 @@ const ProfilePage = () => {
 
 					<Box mt={4}>
 						<Tabs.Content value="all">
-							{isLoading && (
-								<Box py={8} textAlign="center">
+							<Grid
+								templateColumns={{ base: "1fr", lg: "1fr 2fr" }}
+								gap={4}
+								alignItems="start"
+							>
+								<GridItem>
+									{isUserLoading ? (
+										<Box
+											bg="white"
+											rounded="lg"
+											borderWidth="1px"
+											borderColor="gray.200"
+											py={10}
+											textAlign="center"
+										>
+											<Spinner color="blue.500" />
+										</Box>
+									) : (
+										<ProfileAbout user={user} isOwnProfile={isOwnProfile} />
+									)}
+								</GridItem>
+
+								<GridItem>
+									{isLoading && (
+										<Box py={8} textAlign="center">
+											<Spinner color="blue.500" />
+										</Box>
+									)}
+									{isError && (
+										<Text py={4} color="red.500" textAlign="center">
+											Failed to load posts.
+										</Text>
+									)}
+									{!isLoading && !isError && <PostCard userPosts={userPosts} />}
+								</GridItem>
+							</Grid>
+						</Tabs.Content>
+						<Tabs.Content value="about">
+							{isUserLoading ? (
+								<Box
+									bg="white"
+									rounded="lg"
+									borderWidth="1px"
+									borderColor="gray.200"
+									py={10}
+									textAlign="center"
+								>
 									<Spinner color="blue.500" />
 								</Box>
-							)}
-							{isError && (
-								<Text py={4} color="red.500" textAlign="center">
-									Failed to load posts.
-								</Text>
-							)}
-							{!isLoading && !isError && (
-								<PostCard userPosts={userPosts} />
+							) : (
+								<UserProfileAbout user={user} isOwnProfile={isOwnProfile} />
 							)}
 						</Tabs.Content>
 

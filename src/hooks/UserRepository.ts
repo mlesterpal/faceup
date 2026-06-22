@@ -26,7 +26,7 @@ export const useCreateUser = () => {
 };
 
 export const useGetUser = (userId: number = CURRENT_USER_ID) =>
-	useQuery({
+	useQuery<User>({
 		queryKey: ["user", userId],
 		queryFn: () => getUser(userId),
 	});

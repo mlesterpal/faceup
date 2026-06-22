@@ -26,7 +26,7 @@ export const isOwnProfileUser = (profileUserId: number, currentUserId: number) =
 };
 
 export const buildProfilePlaceholderTabs = (
-	tabs: readonly ProfileTab[] = ["about", "friends", "photos", "reels"],
+	tabs: readonly ProfileTab[] = ["friends", "photos", "reels"],
 ) => {
 	return tabs.map((tab) => ({
 		value: tab,

@@ -7,6 +7,7 @@ import type { DeleteUserPostRequest } from "../entities/post/DeleteUserPostReque
 import type { PostLikeUser } from "../entities/response/PostLikeUser";
 import type { CreatePostCommentRequest } from "../entities/post/CreatePostCommentRequest";
 import type { CreatePostCommentResponse } from "../entities/response/CreatePostCommentResponse";
+import type { PostComments } from "@/entities/response/PostComments";
 
 const base = "/post";
 
@@ -15,73 +16,85 @@ type PostResults<T> = { results: T[] };
 type TogglePostLikePayload = { userId: number };
 
 export const getPosts = async (
-	userId?: number | null,
-	viewerUserId?: number | null,
+    userId?: number | null,
+    viewerUserId?: number | null,
 ): Promise<UserPosts[]> => {
-	const { data } = await axiosInstance.get<PostResults<UserPosts>>(base, {
-		params: {
-			...(userId != null ? { userId } : {}),
-			...(viewerUserId != null ? { viewerUserId } : {}),
-		},
-	});
+    const { data } = await axiosInstance.get<PostResults<UserPosts>>(base, {
+        params: {
+            ...(userId != null ? { userId } : {}),
+            ...(viewerUserId != null ? { viewerUserId } : {}),
+        },
+    });
 
-	return data.results ?? [];
+    return data.results ?? [];
+};
+
+export const getPostComments = async (
+    postId: number,
+): Promise<PostComments[]> => {
+    const { data } = await axiosInstance.get<PostResults<PostComments>>(
+        `${base}/${postId}/comments`,
+    );
+
+    return data.results ?? [];
 };
 
 export const getPostLikes = async (postId: number): Promise<PostLikeUser[]> => {
-	const { data } = await axiosInstance.get<PostResults<PostLikeUser>>(
-		`${base}/${postId}/likes`,
-	);
+    const { data } = await axiosInstance.get<PostResults<PostLikeUser>>(
+        `${base}/${postId}/likes`,
+    );
 
-	return data.results ?? [];
+    return data.results ?? [];
 };
 
 export const createPostComment = async (
-	postId: number,
-	payload: CreatePostCommentRequest,
+    postId: number,
+    payload: CreatePostCommentRequest,
 ): Promise<CreatePostCommentResponse> => {
-	const { data } = await axiosInstance.post<CreatePostCommentResponse>(
-		`${base}/${postId}/comments`,
-		payload,
-	);
+    const { data } = await axiosInstance.post<CreatePostCommentResponse>(
+        `${base}/${postId}/comments`,
+        payload,
+    );
 
-	return data;
+    return data;
 };
 
 export const togglePostLike = async (
-	postId: number,
-	userId: number,
+    postId: number,
+    userId: number,
 ): Promise<TogglePostLikeResponse> => {
-	const { data } = await axiosInstance.post<TogglePostLikeResponse>(
-		`${base}/${postId}/like/toggle`,
-		{ userId } satisfies TogglePostLikePayload,
-	);
+    const { data } = await axiosInstance.post<TogglePostLikeResponse>(
+        `${base}/${postId}/like/toggle`,
+        { userId } satisfies TogglePostLikePayload,
+    );
 
-	return data;
+    return data;
 };
 
 type TogglePostSharePayload = { userId: number };
 
 export const togglePostShare = async (
-	postId: number,
-	userId: number,
+    postId: number,
+    userId: number,
 ): Promise<TogglePostShareResponse> => {
-	const { data } = await axiosInstance.post<TogglePostShareResponse>(
-		`${base}/${postId}/share/toggle`,
-		{ userId } satisfies TogglePostSharePayload,
-	);
+    const { data } = await axiosInstance.post<TogglePostShareResponse>(
+        `${base}/${postId}/share/toggle`,
+        { userId } satisfies TogglePostSharePayload,
+    );
 
-	return data;
+    return data;
 };
 
-
 export const deleteUserPost = async (
-	postId: number,
-	userId: number,
+    postId: number,
+    userId: number,
 ): Promise<DeleteUserPostResponse> => {
-	const { data } = await axiosInstance.delete<DeleteUserPostResponse>(`${base}/${postId}`, {
-		data: { userId } satisfies DeleteUserPostRequest,
-	});
+    const { data } = await axiosInstance.delete<DeleteUserPostResponse>(
+        `${base}/${postId}`,
+        {
+            data: { userId } satisfies DeleteUserPostRequest,
+        },
+    );
 
-	return data;
+    return data;
 };

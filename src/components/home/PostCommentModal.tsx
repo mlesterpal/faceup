@@ -17,7 +17,7 @@ import { FaRegComment, FaUserCircle } from "react-icons/fa";
 import { IoClose, IoSend } from "react-icons/io5";
 import { formatTimeAgo } from "../../utils/formatTimeAgo";
 import { resolveImageUrl } from "../../utils/resolveImageUrl";
-import { useCreatePostComment } from "../../hooks/PostRepository";
+import { useCreatePostComment, useGetPostComments } from "../../hooks/PostRepository";
 
 const authorHeader = (
     profilePicture: string,
@@ -45,45 +45,6 @@ const authorHeader = (
     </Flex>
 );
 
-type MockPostComment = {
-    id: number;
-    name: string;
-    comment: string;
-    avatarUrl?: string;
-    createdAt: string;
-};
-
-const MOCK_COMMENTS: MockPostComment[] = [
-    {
-        id: 1,
-        name: "Ella Cruz",
-        comment: "This looks amazing! Love the vibe in this post.",
-        createdAt: "2026-06-14T11:00:00Z",
-    },
-    {
-        id: 2,
-        name: "Ryan Lee",
-        comment: "Great shot. Where was this taken?",
-        avatarUrl:
-            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&w=80&h=80&q=80",
-        createdAt: "2026-06-14T11:06:00Z",
-    },
-    {
-        id: 3,
-        name: "Sophie Lim",
-        comment: "Super clean composition. Keep posting more!",
-        avatarUrl:
-            "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=facearea&w=80&h=80&q=80",
-        createdAt: "2026-06-14T11:12:00Z",
-    },
-    {
-        id: 4,
-        name: "Marcus Tan",
-        comment: "The lighting is really good here.",
-        createdAt: "2026-06-14T11:17:00Z",
-    },
-];
-
 type PostCommentModalProps = {
     postId: number;
     profilePicture: string;
@@ -102,8 +63,12 @@ const PostCommentModal = ({
     imageSrc,
 }: PostCommentModalProps) => {
     const [draftComment, setDraftComment] = useState("");
-    const [comments, setComments] = useState<MockPostComment[]>(MOCK_COMMENTS);
     const createCommentMutation = useCreatePostComment();
+    const {
+        data: comments = [],
+        isLoading: isCommentsLoading,
+        isError: isCommentsError,
+    } = useGetPostComments(postId);
 
     const hasMessage = Boolean(message?.trim());
     const resolvedPostImage = resolveImageUrl(imageSrc);
@@ -116,15 +81,6 @@ const PostCommentModal = ({
             { postId, comment: trimmed },
             {
                 onSuccess: () => {
-                    setComments((prev) => [
-                        ...prev,
-                        {
-                            id: Date.now(),
-                            name: "You",
-                            comment: trimmed,
-                            createdAt: new Date().toISOString(),
-                        },
-                    ]);
                     setDraftComment("");
                 },
             },
@@ -206,66 +162,100 @@ const PostCommentModal = ({
                                 </Box>
 
                                 <VStack align="stretch" gap={0} p={4}>
-                                    {comments.map((comment) => (
-                                        <Flex key={comment.id} align="flex-start" gap={3} py={2}>
-                                            <Circle
-                                                size="9"
-                                                bg="gray.100"
-                                                overflow="hidden"
-                                                flexShrink={0}
-                                            >
-                                                {comment.avatarUrl ? (
-                                                    <Image
-                                                        src={comment.avatarUrl}
-                                                        alt={comment.name}
-                                                        w="100%"
-                                                        h="100%"
-                                                        objectFit="cover"
-                                                    />
-                                                ) : (
-                                                    <Icon
-                                                        as={FaUserCircle}
-                                                        boxSize="9"
-                                                        color="gray.400"
-                                                    />
-                                                )}
-                                            </Circle>
+                                    {isCommentsLoading && (
+                                        <Text color="#6F7175" fontSize="14px" py={2}>
+                                            Loading comments...
+                                        </Text>
+                                    )}
 
-                                            <Box flex="1" minW={0}>
-                                                <Box
-                                                    bg="gray.100"
-                                                    rounded="2xl"
-                                                    px={3}
+                                    {isCommentsError && (
+                                        <Text color="#6F7175" fontSize="14px" py={2}>
+                                            Unable to load comments right now.
+                                        </Text>
+                                    )}
+
+                                    {!isCommentsLoading &&
+                                        !isCommentsError &&
+                                        comments.length === 0 && (
+                                            <Text color="#6F7175" fontSize="14px" py={2}>
+                                                No comments yet.
+                                            </Text>
+                                        )}
+
+                                    {!isCommentsLoading &&
+                                        !isCommentsError &&
+                                        comments.map((comment) => {
+                                            const commentName =
+                                                `${comment.firstName ?? ""} ${comment.lastName ?? ""}`.trim() ||
+                                                "Unknown User";
+                                            const commentAvatar = resolveImageUrl(comment.profilePicture);
+
+                                            return (
+                                                <Flex
+                                                    key={`${comment.userId}-${comment.commentedAt}-${comment.content}`}
+                                                    align="flex-start"
+                                                    gap={3}
                                                     py={2}
-                                                    w="fit-content"
-                                                    maxW="100%"
                                                 >
-                                                    <Text
-                                                        fontWeight="600"
-                                                        color="#080809"
-                                                        fontSize="14px"
+                                                    <Circle
+                                                        size="9"
+                                                        bg="gray.100"
+                                                        overflow="hidden"
+                                                        flexShrink={0}
                                                     >
-                                                        {comment.name}
-                                                    </Text>
-                                                    <Text
-                                                        color="#080809"
-                                                        fontSize="14px"
-                                                        whiteSpace="pre-wrap"
-                                                    >
-                                                        {comment.comment}
-                                                    </Text>
-                                                </Box>
-                                                <Text
-                                                    color="#6F7175"
-                                                    fontSize="12px"
-                                                    mt={1}
-                                                    ml={2}
-                                                >
-                                                    {formatTimeAgo(comment.createdAt)}
-                                                </Text>
-                                            </Box>
-                                        </Flex>
-                                    ))}
+                                                        {commentAvatar ? (
+                                                            <Image
+                                                                src={commentAvatar}
+                                                                alt={commentName}
+                                                                w="100%"
+                                                                h="100%"
+                                                                objectFit="cover"
+                                                            />
+                                                        ) : (
+                                                            <Icon
+                                                                as={FaUserCircle}
+                                                                boxSize="9"
+                                                                color="gray.400"
+                                                            />
+                                                        )}
+                                                    </Circle>
+
+                                                    <Box flex="1" minW={0}>
+                                                        <Box
+                                                            bg="gray.100"
+                                                            rounded="2xl"
+                                                            px={3}
+                                                            py={2}
+                                                            w="fit-content"
+                                                            maxW="100%"
+                                                        >
+                                                            <Text
+                                                                fontWeight="600"
+                                                                color="#080809"
+                                                                fontSize="14px"
+                                                            >
+                                                                {commentName}
+                                                            </Text>
+                                                            <Text
+                                                                color="#080809"
+                                                                fontSize="14px"
+                                                                whiteSpace="pre-wrap"
+                                                            >
+                                                                {comment.content}
+                                                            </Text>
+                                                        </Box>
+                                                        <Text
+                                                            color="#6F7175"
+                                                            fontSize="12px"
+                                                            mt={1}
+                                                            ml={2}
+                                                        >
+                                                            {formatTimeAgo(comment.commentedAt)}
+                                                        </Text>
+                                                    </Box>
+                                                </Flex>
+                                            );
+                                        })}
                                 </VStack>
                             </Dialog.Body>
 
