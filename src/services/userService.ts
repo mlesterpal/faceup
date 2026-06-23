@@ -3,28 +3,28 @@ import type { UpdateUserProfilePayload } from "../entities/response/UpdateUserPr
 import type { User } from "../entities/response/User";
 
 export const getUser = (userId: number): Promise<User> =>
-	axiosInstance.get<User>(`/user/${userId}`).then((res) => res.data);
+    axiosInstance.get<User>(`/user/${userId}`).then((res) => res.data);
 
 export const uploadProfilePicture = (userId: number, file: File) => {
-		const formData = new FormData();
-	formData.append("image", file);
+    const formData = new FormData();
+    formData.append("image", file);
 
-	return axiosInstance
-		.post<{ profilePictureUrl: string }>(
-			`/user/${userId}/profile-picture`,
-			formData,
-			{
-				headers: { "Content-Type": "multipart/form-data" },
-			},
-		)
-		.then((res) => res.data);
+    return axiosInstance
+        .post<{ profilePictureUrl: string }>(
+            `/user/${userId}/profile-picture`,
+            formData,
+            {
+                headers: { "Content-Type": "multipart/form-data" },
+            },
+        )
+        .then((res) => res.data);
 };
 
 export const updateUserProfile = (
-	userId: number,
-	payload: UpdateUserProfilePayload,
+    userId: number,
+    payload: UpdateUserProfilePayload,
 ): Promise<User> => {
-	return axiosInstance
-		.put<User>(`/user/${userId}/profile`, payload)
-		.then((res) => res.data);
+    return axiosInstance
+        .put<User>(`/user/${userId}/profile`, payload)
+        .then((res) => res.data);
 };
