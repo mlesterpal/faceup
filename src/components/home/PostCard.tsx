@@ -157,7 +157,11 @@ const PostCardItem = ({ post }: { post: UserPosts }) => {
                     </Flex>
 
                     <Flex fontSize="14px" columnGap={5}>
-                        <Text color="#6F7175">0 comments</Text>
+                        {post.commentCount > 0 && (
+                            <Text color="#6F7175">
+                                {post.commentCount} comments
+                            </Text>
+                        )}
 
                         {hasShares && (
                             <>
