@@ -1,4 +1,4 @@
-import { Box, Drawer, Grid, GridItem, HStack, IconButton, Input, InputGroup, Text, VStack, useDisclosure } from "@chakra-ui/react";
+import { Box, Drawer, Grid, GridItem, HStack, IconButton, Input, InputGroup, Menu, Text, VStack, useDisclosure } from "@chakra-ui/react";
 import type { ComponentType } from "react";
 import { FaBell, FaBars, FaSearch } from "react-icons/fa";
 import { GoHome } from "react-icons/go";
@@ -10,6 +10,8 @@ import { BsFillGrid3X3GapFill } from "react-icons/bs";
 import { FaFacebookMessenger, FaUserCircle } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 import { Tooltip } from "../ui/tooltip";
+import NotificationsDropdown from "./NotificationsDropdown";
+import { MOCK_NOTIFICATIONS } from "./notifications.mock";
 
 const CENTER_NAV_ITEMS = [
 	{ id: "home", label: "Home", to: "/home", icon: GoHome, end: true },
@@ -200,17 +202,18 @@ const Navbar = () => {
 								<FaFacebookMessenger />
 							</IconButton>
 						</Tooltip>
-						<Tooltip content="Notifications" positioning={{ placement: "bottom" }}>
-							<IconButton
-								fontSize="lg"
-								color="gray.700"
-								bg="gray.200"
-								rounded="full"
-								aria-label="Notifications"
-							>
-								<FaBell />
-							</IconButton>
-						</Tooltip>
+						<Menu.Root positioning={{ placement: "bottom-end" }}>
+							<Menu.Trigger asChild>
+								<IconButton fontSize="lg" color="gray.700" bg="gray.200" rounded="full" aria-label="Notifications">
+									<FaBell />
+								</IconButton>
+							</Menu.Trigger>
+							<Menu.Positioner>
+								<Menu.Content p={0} border="none" shadow="none" bg="transparent">
+									<NotificationsDropdown notifications={MOCK_NOTIFICATIONS} />
+								</Menu.Content>
+							</Menu.Positioner>
+						</Menu.Root>
 						<Tooltip content="Profile" positioning={{ placement: "bottom" }}>
 							<IconButton asChild fontSize="4xl" color="gray.400" rounded="full" aria-label="Profile">
 								<NavLink
