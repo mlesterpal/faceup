@@ -9,9 +9,10 @@ import { FiYoutube } from "react-icons/fi";
 import { BsFillGrid3X3GapFill } from "react-icons/bs";
 import { FaFacebookMessenger, FaUserCircle } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
+import { CURRENT_USER_ID } from "../../constants/currentUser";
+import { useGetNotifications } from "../../hooks/NotificationRepository";
 import { Tooltip } from "../ui/tooltip";
 import NotificationsDropdown from "./NotificationsDropdown";
-import { MOCK_NOTIFICATIONS } from "./notifications.mock";
 
 const CENTER_NAV_ITEMS = [
 	{ id: "home", label: "Home", to: "/home", icon: GoHome, end: true },
@@ -89,6 +90,7 @@ const NavbarDrawerLink = ({
 
 const Navbar = () => {
 	const { open, onOpen, setOpen } = useDisclosure();
+	const { data: notifications = [], isLoading: isNotificationsLoading } = useGetNotifications(CURRENT_USER_ID);
 
 	return (
 		<Box
@@ -210,7 +212,10 @@ const Navbar = () => {
 							</Menu.Trigger>
 							<Menu.Positioner>
 								<Menu.Content p={0} border="none" shadow="none" bg="transparent">
-									<NotificationsDropdown notifications={MOCK_NOTIFICATIONS} />
+									<NotificationsDropdown
+										notifications={notifications}
+										isLoading={isNotificationsLoading}
+									/>
 								</Menu.Content>
 							</Menu.Positioner>
 						</Menu.Root>

@@ -1,18 +1,21 @@
 import { Box, Button, Circle, Flex, HStack, Icon, Text, VStack } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
-import type { NotificationItem } from "./notifications.mock";
+import type { UserNotification } from "../../entities/response/UserNotification";
+import { formatTimeAgo } from "../../utils/formatTimeAgo";
+import { resolveImageUrl } from "../../utils/resolveImageUrl";
 
 type NotificationsDropdownProps = {
-	notifications: NotificationItem[];
+	notifications: UserNotification[];
+	isLoading?: boolean;
 };
 
-const NotificationsDropdown = ({ notifications }: NotificationsDropdownProps) => {
+const NotificationsDropdown = ({ notifications, isLoading = false }: NotificationsDropdownProps) => {
 	const [filter, setFilter] = useState<"all" | "unread">("all");
 
 	const visibleNotifications = useMemo(() => {
 		if (filter === "unread") {
-			return notifications.filter((item) => item.isUnread);
+			return notifications.filter((item) => !item.isRead);
 		}
 		return notifications;
 	}, [filter, notifications]);
@@ -55,52 +58,63 @@ const NotificationsDropdown = ({ notifications }: NotificationsDropdownProps) =>
 			</Box>
 
 			<VStack align="stretch" gap={0} maxH="330px" overflowY="auto">
-				{visibleNotifications.length === 0 && (
+				{isLoading && (
+					<Text px={4} py={5} color="#6F7175" fontSize="14px">
+						Loading notifications...
+					</Text>
+				)}
+
+				{!isLoading && visibleNotifications.length === 0 && (
 					<Text px={4} py={5} color="#6F7175" fontSize="14px">
 						No notifications in this filter.
 					</Text>
 				)}
 
-				{visibleNotifications.map((item) => (
-					<Flex
-						key={item.id}
-						align="flex-start"
-						gap={3}
-						px={4}
-						py={3}
-						bg={item.isUnread ? "blue.50" : "white"}
-						_hover={{ bg: item.isUnread ? "blue.100" : "gray.50" }}
-					>
-						<Circle size="10" bg="gray.200" overflow="hidden" flexShrink={0}>
-							{item.avatarUrl ? (
-								<img
-									src={item.avatarUrl}
-									alt="notification avatar"
-									style={{
-										width: "100%",
-										height: "100%",
-										objectFit: "cover",
-									}}
-								/>
-							) : (
-								<Icon as={FaUserCircle} boxSize="10" color="gray.400" />
+				{!isLoading && visibleNotifications.map((item) => {
+					const avatarUrl = resolveImageUrl(item.actorProfilePicture);
+					const timeAgo = formatTimeAgo(item.createdAt);
+
+					return (
+						<Flex
+							key={item.notificationId}
+							align="flex-start"
+							gap={3}
+							px={4}
+							py={3}
+							bg={item.isRead ? "white" : "blue.50"}
+							_hover={{ bg: item.isRead ? "gray.50" : "blue.100" }}
+						>
+							<Circle size="10" bg="gray.200" overflow="hidden" flexShrink={0}>
+								{avatarUrl ? (
+									<img
+										src={avatarUrl}
+										alt={item.actorName}
+										style={{
+											width: "100%",
+											height: "100%",
+											objectFit: "cover",
+										}}
+									/>
+								) : (
+									<Icon as={FaUserCircle} boxSize="10" color="gray.400" />
+								)}
+							</Circle>
+
+							<VStack align="start" gap={0} flex="1" minW={0}>
+								<Text color="#080809" fontSize="14px" lineHeight="1.35">
+									{item.message}
+								</Text>
+								<Text color="#6F7175" fontSize="12px" fontWeight="500" mt={1}>
+									{timeAgo}
+								</Text>
+							</VStack>
+
+							{!item.isRead && (
+								<Circle size="2" bg="blue.500" mt={2} flexShrink={0} />
 							)}
-						</Circle>
-
-						<VStack align="start" gap={0} flex="1" minW={0}>
-							<Text color="#080809" fontSize="14px" lineHeight="1.35">
-								{item.message}
-							</Text>
-							<Text color="#6F7175" fontSize="12px" fontWeight="500" mt={1}>
-								{item.timestamp}
-							</Text>
-						</VStack>
-
-						{item.isUnread && (
-							<Circle size="2" bg="blue.500" mt={2} flexShrink={0} />
-						)}
-					</Flex>
-				))}
+						</Flex>
+					);
+				})}
 			</VStack>
 
 			<Box borderTopWidth="1px" borderColor="gray.200" p={3}>
