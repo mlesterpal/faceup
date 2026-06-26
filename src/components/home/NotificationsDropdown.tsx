@@ -1,6 +1,7 @@
-import { Box, Button, Circle, Flex, HStack, Icon, Text, VStack } from "@chakra-ui/react";
+import { Box, Button, Circle, Flex, HStack, Icon, IconButton, Menu, Text, VStack } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
+import { HiDotsHorizontal } from "react-icons/hi";
 import type { UserNotification } from "../../entities/response/UserNotification";
 import { formatTimeAgo } from "../../utils/formatTimeAgo";
 import { resolveImageUrl } from "../../utils/resolveImageUrl";
@@ -8,10 +9,15 @@ import { resolveImageUrl } from "../../utils/resolveImageUrl";
 type NotificationsDropdownProps = {
 	notifications: UserNotification[];
 	isLoading?: boolean;
+	onMarkAsRead?: (notificationId: number) => void;
 };
 
-const NotificationsDropdown = ({ notifications, isLoading = false }: NotificationsDropdownProps) => {
+const NotificationsDropdown = ({ notifications, isLoading = false, onMarkAsRead }: NotificationsDropdownProps) => {
 	const [filter, setFilter] = useState<"all" | "unread">("all");
+	const [hoveredNotificationId, setHoveredNotificationId] = useState<number | null>(null);
+	const handleMarkAsRead = (notificationId: number) => {
+		onMarkAsRead?.(notificationId);
+	};
 
 	const visibleNotifications = useMemo(() => {
 		if (filter === "unread") {
@@ -83,6 +89,10 @@ const NotificationsDropdown = ({ notifications, isLoading = false }: Notificatio
 							py={3}
 							bg={item.isRead ? "white" : "blue.50"}
 							_hover={{ bg: item.isRead ? "gray.50" : "blue.100" }}
+							onMouseEnter={() => setHoveredNotificationId(item.notificationId)}
+							onMouseLeave={() => setHoveredNotificationId((current) =>
+								current === item.notificationId ? null : current,
+							)}
 						>
 							<Circle size="10" bg="gray.200" overflow="hidden" flexShrink={0}>
 								{avatarUrl ? (
@@ -109,9 +119,37 @@ const NotificationsDropdown = ({ notifications, isLoading = false }: Notificatio
 								</Text>
 							</VStack>
 
-							{!item.isRead && (
-								<Circle size="2" bg="blue.500" mt={2} flexShrink={0} />
-							)}
+							<VStack align="center" gap={1} flexShrink={0}>
+								<Menu.Root positioning={{ placement: "bottom-end" }}>
+									<Menu.Trigger asChild>
+										<IconButton
+											variant="ghost"
+											size="xs"
+											rounded="full"
+											aria-label="Notification actions"
+											color="#6F7175"
+											opacity={hoveredNotificationId === item.notificationId ? 1 : 0}
+											pointerEvents={hoveredNotificationId === item.notificationId ? "auto" : "none"}
+										>
+											<HiDotsHorizontal />
+										</IconButton>
+									</Menu.Trigger>
+									<Menu.Positioner>
+										<Menu.Content minW="160px">
+											<Menu.Item
+												value={`mark-as-read-${item.notificationId}`}
+												onClick={() => handleMarkAsRead(item.notificationId)}
+											>
+												Mark as Read
+											</Menu.Item>
+										</Menu.Content>
+									</Menu.Positioner>
+								</Menu.Root>
+
+								{!item.isRead && (
+									<Circle size="2" bg="blue.500" mt={2} flexShrink={0} />
+								)}
+							</VStack>
 						</Flex>
 					);
 				})}
