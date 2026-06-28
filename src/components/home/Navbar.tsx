@@ -10,7 +10,7 @@ import { BsFillGrid3X3GapFill } from "react-icons/bs";
 import { FaFacebookMessenger, FaUserCircle } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 import { CURRENT_USER_ID } from "../../constants/currentUser";
-import { useGetNotifications } from "../../hooks/NotificationRepository";
+import { useGetNotifications, useMarkNotificationAsRead } from "../../hooks/NotificationRepository";
 import { Tooltip } from "../ui/tooltip";
 import NotificationsDropdown from "./NotificationsDropdown";
 
@@ -91,6 +91,7 @@ const NavbarDrawerLink = ({
 const Navbar = () => {
 	const { open, onOpen, setOpen } = useDisclosure();
 	const { data: notifications = [], isLoading: isNotificationsLoading } = useGetNotifications(CURRENT_USER_ID);
+	const markAsReadMutation = useMarkNotificationAsRead(CURRENT_USER_ID);
 
 	return (
 		<Box
@@ -215,6 +216,9 @@ const Navbar = () => {
 									<NotificationsDropdown
 										notifications={notifications}
 										isLoading={isNotificationsLoading}
+										onMarkAsRead={(notificationId) =>
+											markAsReadMutation.mutate(notificationId)
+										}
 									/>
 								</Menu.Content>
 							</Menu.Positioner>
