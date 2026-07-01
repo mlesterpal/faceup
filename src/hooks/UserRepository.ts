@@ -11,7 +11,10 @@ import type { User } from "../entities/response/User";
 import APIClient, { type FetchResponse } from "../services/apiClient";
 import {
     getUser,
+    updateProfileFieldVisibility,
     updateUserProfile,
+    type UpdateProfileFieldVisibilityRequest,
+    type UpdateProfileFieldVisibilityResponse,
     uploadProfilePicture,
 } from "../services/userService";
 import { formatBirthDateIso } from "../utils/formatBirthDateIso";
@@ -91,6 +94,46 @@ export const useUpdateUserProfile = (userId: number = CURRENT_USER_ID) => {
                     return {
                         ...currentUser,
                         ...updatedUser,
+                    };
+                },
+            );
+        },
+    });
+};
+
+export const useUpdateProfileFieldVisibility = (userId: number = CURRENT_USER_ID) => {
+    const queryClient = useQueryClient();
+
+    return useMutation<
+        UpdateProfileFieldVisibilityResponse,
+        Error,
+        UpdateProfileFieldVisibilityRequest
+    >({
+        mutationFn: (payload) => updateProfileFieldVisibility(userId, payload),
+        onSuccess: (response) => {
+            queryClient.setQueryData<User | undefined>(
+                ["user", userId],
+                (currentUser) => {
+                    if (!currentUser) return currentUser;
+
+                    const visibilityByField: Record<string, keyof User> = {
+                        bio: "bioVisibility",
+                        address: "addressVisibility",
+                        work: "workVisibility",
+                        highSchool: "highSchoolVisibility",
+                        college: "collegeVisibility",
+                        hobbies: "hobbiesVisibility",
+                        phone: "phoneVisibility",
+                        gender: "genderVisibility",
+                        birthDate: "birthDateVisibility",
+                    };
+
+                    const visibilityKey = visibilityByField[response.fieldName];
+                    if (!visibilityKey) return currentUser;
+
+                    return {
+                        ...currentUser,
+                        [visibilityKey]: response.visibility,
                     };
                 },
             );

@@ -15,6 +15,8 @@ type AboutField = {
 	visibility: FieldVisibility;
 };
 
+type ApiVisibility = "Public" | "Private" | null | undefined;
+
 const formatBirthDate = (birthDate?: string | null): string | null => {
 	if (!birthDate) return null;
 
@@ -30,36 +32,66 @@ const formatBirthDate = (birthDate?: string | null): string | null => {
 	});
 };
 
-const canDisplayField = (field: AboutField, isOwnProfile: boolean) => {
+const fromApiVisibility = (visibility: ApiVisibility): FieldVisibility => {
+	if (visibility === "Private") return "private";
+	return "public";
+};
+
+const canDisplayField = (field: AboutField) => {
 	if (!field.value || !field.value.trim()) return false;
-	if (field.visibility === "public") return true;
-	return isOwnProfile;
+	return field.visibility === "public";
 };
 
 const ProfileAbout = ({ user, isOwnProfile }: ProfileAboutProps) => {
 	const aboutFields: AboutField[] = [
-		{ label: "Gender", value: user?.gender, visibility: "public" },
+		{
+			label: "Gender",
+			value: user?.gender,
+			visibility: fromApiVisibility(user?.genderVisibility),
+		},
 		{
 			label: "Birthdate",
 			value: formatBirthDate(user?.birthDate),
-			visibility: "public",
+			visibility: fromApiVisibility(user?.birthDateVisibility),
 		},
-		{ label: "Bio", value: user?.bio, visibility: "public" },
-		{ label: "Address", value: user?.address, visibility: "public" },
-		{ label: "Work", value: user?.work, visibility: "public" },
+		{
+			label: "Bio",
+			value: user?.bio,
+			visibility: fromApiVisibility(user?.bioVisibility),
+		},
+		{
+			label: "Address",
+			value: user?.address,
+			visibility: fromApiVisibility(user?.addressVisibility),
+		},
+		{
+			label: "Work",
+			value: user?.work,
+			visibility: fromApiVisibility(user?.workVisibility),
+		},
 		{
 			label: "High School",
 			value: user?.highSchool,
-			visibility: "public",
+			visibility: fromApiVisibility(user?.highSchoolVisibility),
 		},
-		{ label: "College", value: user?.college, visibility: "public" },
-		{ label: "Hobbies", value: user?.hobbies, visibility: "public" },
-		{ label: "Phone", value: user?.phone, visibility: "public" },
+		{
+			label: "College",
+			value: user?.college,
+			visibility: fromApiVisibility(user?.collegeVisibility),
+		},
+		{
+			label: "Hobbies",
+			value: user?.hobbies,
+			visibility: fromApiVisibility(user?.hobbiesVisibility),
+		},
+		{
+			label: "Phone",
+			value: user?.phone,
+			visibility: fromApiVisibility(user?.phoneVisibility),
+		},
 	];
 
-	const visibleFields = aboutFields.filter((field) =>
-		canDisplayField(field, isOwnProfile),
-	);
+	const visibleFields = aboutFields.filter((field) => canDisplayField(field));
 
 	return (
 		<Box bg="white" rounded="lg" borderWidth="1px" borderColor="gray.200" p={5}>

@@ -1,9 +1,9 @@
-import { Box, Button, Flex, IconButton, Input, Text, Textarea } from "@chakra-ui/react";
+import { Box, Button, Dialog, Flex, HStack, Icon, IconButton, Input, Text, Textarea, VStack } from "@chakra-ui/react";
 import type { UpdateUserProfilePayload } from "../../entities/response/UpdateUserProfilePayload";
 import type { User } from "../../entities/response/User";
-import { FiEdit2 } from "react-icons/fi";
+import { FiEdit2, FiGlobe, FiLock } from "react-icons/fi";
 import { useEffect, useMemo, useState } from "react";
-import { useUpdateUserProfile } from "../../hooks/UserRepository";
+import { useUpdateProfileFieldVisibility, useUpdateUserProfile } from "../../hooks/UserRepository";
 
 type FieldVisibility = "public" | "private";
 
@@ -44,41 +44,70 @@ const normalizeDraftValue = (value: string): string | null => {
 	return trimmed.length > 0 ? trimmed : null;
 };
 
+const fromApiVisibility = (
+	visibility: User["bioVisibility"] | undefined,
+	fallback: FieldVisibility,
+): FieldVisibility => {
+	if (visibility === "Public") return "public";
+	if (visibility === "Private") return "private";
+	return fallback;
+};
+
 const buildFields = (user?: User): ProfileField[] => [
-	{ key: "gender", label: "Gender", value: user?.gender ?? null, visibility: "public" },
+	{
+		key: "gender",
+		label: "Gender",
+		value: user?.gender ?? null,
+		visibility: fromApiVisibility(user?.genderVisibility, "public"),
+	},
 	{
 		key: "birthDate",
 		label: "Birthdate",
 		value: formatBirthDate(user?.birthDate),
-		visibility: "public",
+		visibility: fromApiVisibility(user?.birthDateVisibility, "public"),
 	},
-	{ key: "bio", label: "Bio", value: user?.bio ?? null, visibility: "public" },
+	{
+		key: "bio",
+		label: "Bio",
+		value: user?.bio ?? null,
+		visibility: fromApiVisibility(user?.bioVisibility, "public"),
+	},
 	{
 		key: "address",
 		label: "Address",
 		value: user?.address ?? null,
-		visibility: "private",
+		visibility: fromApiVisibility(user?.addressVisibility, "private"),
 	},
-	{ key: "work", label: "Work", value: user?.work ?? null, visibility: "public" },
+	{
+		key: "work",
+		label: "Work",
+		value: user?.work ?? null,
+		visibility: fromApiVisibility(user?.workVisibility, "public"),
+	},
 	{
 		key: "highSchool",
 		label: "High School",
 		value: user?.highSchool ?? null,
-		visibility: "public",
+		visibility: fromApiVisibility(user?.highSchoolVisibility, "public"),
 	},
 	{
 		key: "college",
 		label: "College",
 		value: user?.college ?? null,
-		visibility: "public",
+		visibility: fromApiVisibility(user?.collegeVisibility, "public"),
 	},
 	{
 		key: "hobbies",
 		label: "Hobbies",
 		value: user?.hobbies ?? null,
-		visibility: "public",
+		visibility: fromApiVisibility(user?.hobbiesVisibility, "public"),
 	},
-	{ key: "phone", label: "Phone", value: user?.phone ?? null, visibility: "private" },
+	{
+		key: "phone",
+		label: "Phone",
+		value: user?.phone ?? null,
+		visibility: fromApiVisibility(user?.phoneVisibility, "private"),
+	},
 ];
 
 const buildFieldValues = (fields: ProfileField[]) =>
@@ -86,6 +115,12 @@ const buildFieldValues = (fields: ProfileField[]) =>
 		acc[field.key] = field.value;
 		return acc;
 	}, {});
+
+const buildFieldVisibility = (fields: ProfileField[]) =>
+	fields.reduce<Record<EditableProfileFieldKey, FieldVisibility>>((acc, field) => {
+		acc[field.key] = field.visibility;
+		return acc;
+	}, {} as Record<EditableProfileFieldKey, FieldVisibility>);
 
 const UserProfileAbout = ({ user, isOwnProfile }: UserProfileAboutProps) => {
 	const fields = useMemo(() => buildFields(user), [user]);
@@ -95,18 +130,32 @@ const UserProfileAbout = ({ user, isOwnProfile }: UserProfileAboutProps) => {
 	const [draftValues, setDraftValues] = useState<Record<string, string>>({});
 	const [activeFieldKey, setActiveFieldKey] =
 		useState<EditableProfileFieldKey | null>(null);
+	const [visibilityFieldKey, setVisibilityFieldKey] =
+		useState<EditableProfileFieldKey | null>(null);
+	const [visibilityDraft, setVisibilityDraft] = useState<FieldVisibility | null>(null);
+	const [visibilityError, setVisibilityError] = useState<string | null>(null);
+	const [fieldVisibility, setFieldVisibility] =
+		useState<Record<EditableProfileFieldKey, FieldVisibility>>(() =>
+			buildFieldVisibility(fields),
+		);
 	const [saveError, setSaveError] = useState<string | null>(null);
 	const updateUserProfile = useUpdateUserProfile(user?.id);
+	const updateProfileFieldVisibility = useUpdateProfileFieldVisibility(user?.id);
 
 	useEffect(() => {
 		setSavedValues(buildFieldValues(fields));
+		setFieldVisibility(buildFieldVisibility(fields));
 		setDraftValues({});
 		setActiveFieldKey(null);
+		setVisibilityFieldKey(null);
+		setVisibilityDraft(null);
+		setVisibilityError(null);
 	}, [fields]);
 
 	const mergedFields = fields.map((field) => ({
 		...field,
 		value: savedValues[field.key] ?? null,
+		visibility: fieldVisibility[field.key] ?? field.visibility,
 	}));
 
 	const visibleFields = isOwnProfile
@@ -159,6 +208,49 @@ const UserProfileAbout = ({ user, isOwnProfile }: UserProfileAboutProps) => {
 				},
 				onError: (error) => {
 					setSaveError(error.message);
+				},
+			},
+		);
+	};
+
+	const selectedVisibilityField = visibilityFieldKey
+		? mergedFields.find((field) => field.key === visibilityFieldKey)
+		: undefined;
+
+	const handleVisibilitySelect = (visibility: FieldVisibility) => {
+		setVisibilityDraft(visibility);
+		setVisibilityError(null);
+	};
+
+	const handleVisibilityCancel = () => {
+		setVisibilityFieldKey(null);
+		setVisibilityDraft(null);
+		setVisibilityError(null);
+	};
+
+	const toVisibilityPayload = (visibility: FieldVisibility): "Public" | "Private" =>
+		visibility === "public" ? "Public" : "Private";
+
+	const handleVisibilitySave = () => {
+		if (!visibilityFieldKey || !visibilityDraft) return;
+
+		setVisibilityError(null);
+		updateProfileFieldVisibility.mutate(
+			{
+				fieldName: visibilityFieldKey,
+				visibility: toVisibilityPayload(visibilityDraft),
+			},
+			{
+				onSuccess: () => {
+					setFieldVisibility((prev) => ({
+						...prev,
+						[visibilityFieldKey]: visibilityDraft,
+					}));
+					setVisibilityFieldKey(null);
+					setVisibilityDraft(null);
+				},
+				onError: (error) => {
+					setVisibilityError(error.message);
 				},
 			},
 		);
@@ -225,21 +317,122 @@ const UserProfileAbout = ({ user, isOwnProfile }: UserProfileAboutProps) => {
 							</Box>
 
 							{isOwnProfile && (
-								<IconButton
-									aria-label={`Edit ${field.label}`}
-									size="xs"
-									variant="ghost"
-									color="gray.500"
-									mt={1}
-									onClick={() => handleEditClick(field.key, field.value)}
-								>
-									<FiEdit2 />
-								</IconButton>
+								<HStack align="start" gap={1} mt={1}>
+									{hasValue(field.value) && (
+										<IconButton
+											aria-label={`Change ${field.label} visibility`}
+											size="xs"
+											variant="ghost"
+											color="gray.500"
+											onClick={() => {
+												setVisibilityFieldKey(field.key);
+												setVisibilityDraft(field.visibility);
+												setVisibilityError(null);
+											}}
+										>
+											{field.visibility === "public" ? <FiGlobe /> : <FiLock />}
+										</IconButton>
+									)}
+									<IconButton
+										aria-label={`Edit ${field.label}`}
+										size="xs"
+										variant="ghost"
+										color="gray.500"
+										onClick={() => handleEditClick(field.key, field.value)}
+									>
+										<FiEdit2 />
+									</IconButton>
+								</HStack>
 							)}
 						</Flex>
 					))}
 				</Flex>
 			)}
+
+			<Dialog.Root
+				open={Boolean(visibilityFieldKey)}
+				onOpenChange={(details) => {
+					if (!details.open) {
+						handleVisibilityCancel();
+					}
+				}}
+			>
+				<Dialog.Backdrop />
+				<Dialog.Positioner>
+					<Dialog.Content maxW="420px" rounded="xl">
+						<Dialog.Header borderBottomWidth="1px" borderColor="gray.200">
+							<Dialog.Title fontSize="lg" fontWeight="700">
+								{selectedVisibilityField
+									? `Who can see your ${selectedVisibilityField.label.toLowerCase()}?`
+									: "Who can see this information?"}
+							</Dialog.Title>
+						</Dialog.Header>
+						<Dialog.Body pt={4} pb={5}>
+							<VStack align="stretch" gap={3}>
+								<Text color="gray.600" fontSize="sm">
+									Choose the audience for this profile detail.
+								</Text>
+								<Button
+									variant={
+										visibilityDraft === "public"
+											? "solid"
+											: "outline"
+									}
+									colorPalette="blue"
+									justifyContent="space-between"
+									onClick={() => handleVisibilitySelect("public")}
+								>
+									<HStack>
+										<Icon as={FiGlobe} />
+										<Text>Public</Text>
+									</HStack>
+									{visibilityDraft === "public" && (
+										<Text fontSize="xs">Selected</Text>
+									)}
+								</Button>
+								<Button
+									variant={
+										visibilityDraft === "private"
+											? "solid"
+											: "outline"
+									}
+									colorPalette="blue"
+									justifyContent="space-between"
+									onClick={() => handleVisibilitySelect("private")}
+								>
+									<HStack>
+										<Icon as={FiLock} />
+										<Text>Private</Text>
+									</HStack>
+									{visibilityDraft === "private" && (
+										<Text fontSize="xs">Selected</Text>
+									)}
+								</Button>
+								{visibilityError && (
+									<Text color="red.500" fontSize="sm">
+										{visibilityError}
+									</Text>
+								)}
+							</VStack>
+						</Dialog.Body>
+						<Dialog.Footer borderTopWidth="1px" borderColor="gray.200" pt={3}>
+							<HStack w="full" justify="flex-end">
+								<Button variant="ghost" onClick={handleVisibilityCancel} disabled={updateProfileFieldVisibility.isPending}>
+									Cancel
+								</Button>
+								<Button
+									colorPalette="blue"
+									onClick={handleVisibilitySave}
+									loading={updateProfileFieldVisibility.isPending}
+									disabled={!visibilityFieldKey || !visibilityDraft}
+								>
+									Save
+								</Button>
+							</HStack>
+						</Dialog.Footer>
+					</Dialog.Content>
+				</Dialog.Positioner>
+			</Dialog.Root>
 
 			{isOwnProfile && activeFieldKey && (
 				<Flex

@@ -12,4 +12,13 @@ export type User = {
 	college?: string | null;
 	hobbies?: string | null;
 	phone?: string | null;
+	bioVisibility?: "Public" | "Private" | null;
+	addressVisibility?: "Public" | "Private" | null;
+	workVisibility?: "Public" | "Private" | null;
+	highSchoolVisibility?: "Public" | "Private" | null;
+	collegeVisibility?: "Public" | "Private" | null;
+	hobbiesVisibility?: "Public" | "Private" | null;
+	phoneVisibility?: "Public" | "Private" | null;
+	genderVisibility?: "Public" | "Private" | null;
+	birthDateVisibility?: "Public" | "Private" | null;
 };
